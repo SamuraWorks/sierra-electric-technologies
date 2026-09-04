@@ -40,7 +40,7 @@ const projects = [
 ]
 
 function Mark({ light = false }: { light?: boolean }) {
-  return <div className={`brand-mark ${light ? 'brand-mark-light' : ''}`} aria-hidden="true"><span /><span /><span /><span /></div>
+  return <img className={`brand-logo ${light ? 'brand-logo-light' : ''}`} src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1776285047875-mvtv8fMkk7osjEWCypeWq12mH6xUoD.jpg" alt="Sierra Electric Technologies logo" />
 }
 
 function Button({ children, variant = 'primary', href = '#' }: { children: React.ReactNode; variant?: 'primary' | 'outline'; href?: string }) {
@@ -68,8 +68,10 @@ export default function Page() {
           <div className="hero-actions"><Button href="#projects">Explore our work</Button><Button variant="outline" href="#about"><Users size={17} /> About SET</Button></div>
           <a className="text-link" href="#contact">Let&apos;s build what comes next <MoveUpRight size={15} /></a>
         </div>
-        <div className="hero-visual" aria-label="Illustration of SET electric shuttle">
-          <div className="visual-label label-top">SET / EV-01 <span>prototype</span></div>
+        <div className="hero-visual hero-photo" aria-label="SET electric shuttle in the workshop">
+          <img className="hero-photo-image" src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/10%20Passenger%20E%20car%20for%20Africell%20Made%20by%20Sierra%20Electric.jfif-ZaMipho7TuDliZqhJp2H8U3QOYEpNi.jpeg" alt="SET's 10-passenger electric vehicle in its workshop" />
+          <div className="hero-photo-overlay" />
+          <div className="visual-label label-top">SET / EV-01 <span>built in Sierra Leone</span></div>
           <div className="sun-disc" />
           <div className="hero-lines" />
           <div className="shuttle-art"><div className="shuttle-window"><span /><span /><span /></div><div className="shuttle-body"><i /><i /><i /><i /></div><div className="wheel wheel-a" /><div className="wheel wheel-b" /></div>
