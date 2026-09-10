@@ -2,7 +2,7 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
-:root { --background: #f7f5f2; --foreground: #0f1b14; --navy: #101c17; --green: #168343; --green-dark: #0f6733; --muted: #6d756f; --line: #d8d9d3; --soft: #eeece6; --white: #fff; --radius: 1.25rem; }
+:root { --background: #edf4ee; --foreground: #0f1b14; --navy: #101c17; --green: #168343; --green-dark: #0f6733; --muted: #6d756f; --line: #d8e3d8; --soft: #e4eee5; --white: #fff; --radius: 1.25rem; }
 @theme inline { --color-background: var(--background); --color-foreground: var(--foreground); --color-primary: var(--green); --color-border: var(--line); --color-muted-foreground: var(--muted); --radius-lg: var(--radius); --radius-xl: 1.5rem; --radius-2xl: 2rem; }
 * { box-sizing: border-box; border-color: var(--line); }
 html { background: var(--background); scroll-behavior: smooth; }
@@ -16,7 +16,7 @@ a { color: inherit; text-decoration: none; }
 .hero-visual { min-height:0; position:relative; overflow:hidden; border-radius:2rem; background:#dae5d9; }
 .hero-photo { isolation:isolate; }
 .hero-photo-image { display:block; width:100%; height:auto; max-height:560px; object-fit:contain; object-position:center; filter:saturate(.78) contrast(.96); }
-.hero-photo-caption { display:flex; flex-direction:column; gap:6px; padding:16px 20px 18px; background:#dae5d9; color:#173021; }
+.hero-photo-caption { display:flex; flex-direction:column; gap:6px; padding:16px 20px 18px; background:#dfece0; color:#173021; }
 .hero-photo-caption strong { font:11px monospace; letter-spacing:.1em; text-transform:uppercase; }
 .hero-photo-caption span { font-size:13px; line-height:1.45; color:#536158; }
 .brand-logo { width:34px; height:34px; border-radius:50%; object-fit:cover; object-position:center; background:#fff; }
