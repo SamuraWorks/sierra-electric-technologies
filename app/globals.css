@@ -8,6 +8,29 @@
 html { background: var(--background); scroll-behavior: smooth; }
 body { margin: 0; background: var(--background); color: var(--foreground); font-family: Arial, Helvetica, sans-serif; }
 a { color: inherit; text-decoration: none; }
+
+@keyframes set-rise { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+@keyframes set-drift { 0%,100% { transform:translate3d(0,0,0) rotate(0deg); } 50% { transform:translate3d(0,-8px,0) rotate(.35deg); } }
+@keyframes set-pulse { 0%,100% { box-shadow:0 0 0 0 rgba(22,131,67,.18); } 50% { box-shadow:0 0 0 9px rgba(22,131,67,0); } }
+.motion-page .site-header { animation:set-rise .7s ease both; }
+.motion-page .hero-copy > * { opacity:0; animation:set-rise .75s cubic-bezier(.2,.8,.2,1) both; }
+.motion-page .hero-copy > :nth-child(1) { animation-delay:.08s; }
+.motion-page .hero-copy > :nth-child(2) { animation-delay:.16s; }
+.motion-page .hero-copy > :nth-child(3) { animation-delay:.24s; }
+.motion-page .hero-copy > :nth-child(4) { animation-delay:.32s; }
+.motion-page .hero-copy > :nth-child(5) { animation-delay:.4s; }
+.motion-page .hero-photo { opacity:0; animation:set-rise .9s .25s cubic-bezier(.2,.8,.2,1) both; }
+.motion-page .hero-photo-image { animation:set-drift 7s ease-in-out 1s infinite; transform-origin:center; }
+.motion-page .eyebrow-dot { animation:set-pulse 2.4s ease-in-out infinite; }
+.motion-page .motion-section:not(.hero) .section-intro,
+.motion-page .motion-section:not(.hero) .section-heading-row,
+.motion-page .motion-section:not(.hero) .project-browser,
+.motion-page .motion-section:not(.hero) .project-cards { animation:set-rise .8s .1s both; }
+.motion-page .capability-card { transition:transform .3s ease, border-color .3s ease, background .3s ease; }
+.motion-page .capability-card:hover { transform:translateY(-7px); border-color:var(--green); background:rgba(255,255,255,.48); }
+.motion-page .capability-card:hover .icon-chip { transform:rotate(-5deg) scale(1.06); background:#dfece0; }
+.motion-page .icon-chip { transition:transform .3s ease, background .3s ease; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; transition-duration:.01ms !important; } }
 .site-header { height: 78px; padding: 0 clamp(1.25rem, 5vw, 5.5rem); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:20; background: color-mix(in srgb, var(--background) 92%, transparent); backdrop-filter: blur(14px); border-bottom:1px solid var(--line); }
 .brand { display:flex; align-items:center; gap:11px; font-size:10px; line-height:1.08; letter-spacing:.08em; font-weight:700; } .brand b { font-weight:800; } .brand-mark { width:28px; height:28px; display:grid; grid-template-columns:1fr 1fr; gap:2px; transform:skewY(-14deg); } .brand-mark span { background:var(--green); border-radius:2px; } .brand-mark span:nth-child(2) { opacity:.7; } .brand-mark span:nth-child(3) { opacity:.7; } .brand-mark span:nth-child(4) { opacity:.4; }
 .desktop-nav { display:flex; align-items:center; gap:27px; font-size:12px; color:#526057; } .desktop-nav > a:not(.pill-button):hover, .text-link:hover, .card-link:hover { color:var(--green); } .header-actions { display:flex; align-items:center; gap:14px; } .language, .menu-button { border:0; background:none; color:var(--foreground); display:flex; align-items:center; gap:5px; font:inherit; cursor:pointer; } .language { font-size:11px; } .menu-button { display:none; }
