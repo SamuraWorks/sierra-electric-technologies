@@ -13,3 +13,8 @@ __v0_jsx-dev-runtime.ts
 node_modules
 .next/
 .DS_Store
+dev-server.log
+dev-server.log.err
+tsconfig.tsbuildinfo
+next-env.d.ts
+
