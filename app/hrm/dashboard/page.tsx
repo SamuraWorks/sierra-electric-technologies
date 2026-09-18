@@ -10,10 +10,10 @@ export default async function DashboardPage() {
 
   const [employeeCountRes, pendingLeaveRes, candidateCountRes] = await Promise.all([
     ctx && hasPermission(ctx, 'employees.view')
-      ? supabase.from('profiles').select('*', { count: 'exact', head: true })
+      ? supabase.from('profiles').select('*', { count: 'exact', head: true }).neq('employee_id', null)
       : Promise.resolve({ count: null }),
     ctx && hasPermission(ctx, 'leave.view')
-      ? supabase.from('notifications').select('*', { count: 'exact', head: true }).eq('type', 'leave')
+      ? supabase.from('leave_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending')
       : Promise.resolve({ count: null }),
     ctx && hasPermission(ctx, 'candidates.view')
       ? supabase.from('notifications').select('*', { count: 'exact', head: true }).eq('type', 'application')

@@ -76,6 +76,30 @@ export interface AuditLog {
   created_at: string
 }
 
+export interface LeaveType {
+  id: string
+  name: string
+  slug: string
+  default_days: number
+  is_active: boolean
+  created_at: string
+}
+
+export interface LeaveRequest {
+  id: string
+  user_id: string
+  leave_type_id: string
+  start_date: string
+  end_date: string
+  reason: string | null
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled'
+  reviewed_by: string | null
+  reviewed_at: string | null
+  review_note: string | null
+  created_at: string
+  updated_at: string
+}
+
 // --- Composite types (for joined queries) ---
 export interface UserProfile extends Profile {
   user_roles?: UserRole[]
