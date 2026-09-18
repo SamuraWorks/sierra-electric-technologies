@@ -80,7 +80,8 @@ ON CONFLICT (role_id, permission) DO NOTHING;
 -- DEMO DATA (idempotent: only seeds when tables are empty)
 -- ------------------------------------------------------------------
 INSERT INTO public.revenue_transactions (description, client_name, amount, currency, occurred_on)
-SELECT * FROM (VALUES
+SELECT v.description, v.client_name, v.amount, v.currency, v.occurred_on::date
+FROM (VALUES
   ('Grid infrastructure project - phase 1', 'UNDP Sierra Leone', 32500000, 'SLL', '2026-01-18'),
   ('Data centre electrical fit-out', 'Bank of Sierra Leone', 18200000, 'SLL', '2026-03-05'),
   ('Solar mini-grid deployment', 'Ministry of Energy', 45800000, 'SLL', '2026-05-22'),

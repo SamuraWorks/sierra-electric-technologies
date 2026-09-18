@@ -269,20 +269,20 @@ INSERT INTO public.positions (name, slug, description, responsibilities, departm
 SELECT v.name, v.slug, v.description, v.responsibilities,
   (SELECT id FROM public.departments d WHERE d.slug = v.dept_slug)
 FROM (VALUES
-  ('Administrator', 'administrator', 'Company administration and operational oversight.', 'Coordinate operations, review approvals, manage company-wide activity.'),
-  ('System Administrator', 'system-administrator', 'Owner of the company systems and access.', 'Manage users, roles, permissions, audit log and system settings.'),
-  ('Software Engineer', 'software-engineer', 'Builds and maintains company software and platforms.', 'Develop features, fix bugs, ship releases and support internal tools.'),
-  ('Electrical Engineer', 'electrical-engineer', 'Electrical design and project engineering.', 'Design systems, supervise installations, ensure quality and safety.'),
-  ('Engineering Lead', 'engineering-lead', 'Leads engineering delivery teams.', 'Own technical delivery, review designs and mentor the team.'),
-  ('Media Officer', 'media-officer', 'Company communications and media.', 'Produce content, manage channels and support stakeholder communications.'),
-  ('Project Engineer', 'project-engineer', 'Engineers assigned to specific projects.', 'Deliver project engineering tasks on schedule and budget.'),
-  ('Systems Administrator', 'systems-administrator', 'Maintains IT infrastructure and systems.', 'Manage servers, networks and internal platforms.'),
-  ('Finance Manager', 'finance-manager', 'Owns financial planning and control.', 'Oversee payments, expenses, cash flow and financial reports.'),
-  ('HR Officer', 'hr-officer', 'Supports people operations.', 'Maintain staff records, leave and payroll inputs.'),
-  ('Accounts Officer', 'accounts-officer', 'Processes financial transactions.', 'Record payments, reconcile accounts and support month-end.'),
-  ('Site Supervisor', 'site-supervisor', 'Supervises field work at sites.', 'Coordinate crews, enforce safety and report progress.'),
-  ('Sales Executive', 'sales-executive', 'Sells company products and services.', 'Win new business and grow existing accounts.'),
-  ('Field Technician', 'field-technician', 'Installs and services equipment in the field.', 'Carry out installs, checks and repairs on site.')
+  ('Administrator', 'administrator', 'Company administration and operational oversight.', 'Coordinate operations, review approvals, manage company-wide activity.', 'head-office'),
+  ('System Administrator', 'system-administrator', 'Owner of the company systems and access.', 'Manage users, roles, permissions, audit log and system settings.', 'head-office'),
+  ('Software Engineer', 'software-engineer', 'Builds and maintains company software and platforms.', 'Develop features, fix bugs, ship releases and support internal tools.', 'engineering'),
+  ('Electrical Engineer', 'electrical-engineer', 'Electrical design and project engineering.', 'Design systems, supervise installations, ensure quality and safety.', 'engineering'),
+  ('Engineering Lead', 'engineering-lead', 'Leads engineering delivery teams.', 'Own technical delivery, review designs and mentor the team.', 'engineering'),
+  ('Media Officer', 'media-officer', 'Company communications and media.', 'Produce content, manage channels and support stakeholder communications.', 'head-office'),
+  ('Project Engineer', 'project-engineer', 'Engineers assigned to specific projects.', 'Deliver project engineering tasks on schedule and budget.', 'engineering'),
+  ('Systems Administrator', 'systems-administrator', 'Maintains IT infrastructure and systems.', 'Manage servers, networks and internal platforms.', 'engineering'),
+  ('Finance Manager', 'finance-manager', 'Owns financial planning and control.', 'Oversee payments, expenses, cash flow and financial reports.', 'finance'),
+  ('HR Officer', 'hr-officer', 'Supports people operations.', 'Maintain staff records, leave and payroll inputs.', 'human-resources'),
+  ('Accounts Officer', 'accounts-officer', 'Processes financial transactions.', 'Record payments, reconcile accounts and support month-end.', 'finance'),
+  ('Site Supervisor', 'site-supervisor', 'Supervises field work at sites.', 'Coordinate crews, enforce safety and report progress.', 'field-services'),
+  ('Sales Executive', 'sales-executive', 'Sells company products and services.', 'Win new business and grow existing accounts.', 'sales'),
+  ('Field Technician', 'field-technician', 'Installs and services equipment in the field.', 'Carry out installs, checks and repairs on site.', 'field-services')
 ) AS v(name, slug, description, responsibilities, dept_slug)
 WHERE NOT EXISTS (SELECT 1 FROM public.positions);
 
@@ -313,7 +313,7 @@ INSERT INTO public.projects (name, description, lead_id, department_id, status, 
 SELECT v.name, v.description,
   (SELECT id FROM public.profiles WHERE employee_id = v.lead_employee_id),
   (SELECT id FROM public.departments d WHERE d.slug = v.dept_slug),
-  v.status, v.priority, v.start_date, v.target_date, v.progress
+  v.status, v.priority, v.start_date::date, v.target_date::date, v.progress
 FROM (VALUES
   ('EV Shuttle Project', 'EV shuttle fleet electrification and charging infrastructure for the campus shuttle service.',
     'SET-0008', 'engineering', 'active', 'high', '2026-03-01', '2026-12-15', 45),
@@ -365,7 +365,7 @@ INSERT INTO public.tasks (title, description, project_id, assignee_id, status, p
 SELECT v.title, v.description,
   (SELECT id FROM public.projects WHERE name = v.project_name),
   CASE WHEN v.assignee_employee_id IS NULL THEN NULL ELSE (SELECT id FROM public.profiles WHERE employee_id = v.assignee_employee_id) END,
-  v.status, v.priority, v.due_date,
+  v.status, v.priority, v.due_date::date,
   (SELECT id FROM public.profiles WHERE employee_id = 'SET-0001')
 FROM (VALUES
   ('Finalize portal sidebar', 'Ship the new Staff & Operations navigation for the portal.', 'Admin Portal & HR Platform', 'SET-0001', 'in_progress', 'high', '2026-09-20'),
@@ -384,7 +384,7 @@ ON CONFLICT DO NOTHING;
 
 -- Work reports
 INSERT INTO public.work_reports (profile_id, project_id, report_date, work_completed, challenges, next_steps)
-SELECT p.id, pr.id, v.report_date, v.work_completed, v.challenges, v.next_steps
+SELECT p.id, pr.id, v.report_date::date, v.work_completed, v.challenges, v.next_steps
 FROM (VALUES
   ('SET-0008', 'EV Shuttle Project', '2026-09-16', 'Completed the charger location survey and drafted the site plan.', 'Permit approvals for the depot are still pending.', 'Submit site plan and wait for depot permit.'),
   ('SET-0013', 'Solar Mini-Grid Pilot', '2026-09-15', 'Installed the battery rack and ran initial charge cycles on the clinic mini-grid.', 'Inverter firmware is not matching the battery BMS firmware.', 'Coordinate with supplier for a firmware update.'),
@@ -398,7 +398,7 @@ WHERE NOT EXISTS (SELECT 1 FROM public.work_reports);
 
 -- Payments
 INSERT INTO public.payments (recipient_id, amount, period_label, paid_on, method, reference, recorded_by, confirmation_status)
-SELECT p.id, v.amount, v.period_label, v.paid_on, v.method, v.reference,
+SELECT p.id, v.amount, v.period_label, v.paid_on::date, v.method, v.reference,
   (SELECT id FROM public.profiles WHERE employee_id = 'SET-0001'),
   v.confirmation_status
 FROM (VALUES
