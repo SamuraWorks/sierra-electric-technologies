@@ -1,35 +1,226 @@
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react'
+import { Navbar } from '@/components/Navbar'
+import { Footer } from '@/components/Footer'
+import { projectHref, projects } from '@/lib/site'
 
-const logo = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1776285047875-mvtv8fMkk7osjEWCypeWq12mH6xUoD.jpg'
-const photos = {
-  shuttle: ['https://hebbkx1anhila5yf.public.blob.vercel-storage.com/10%20Passenger%20E%20car%20for%20Africell%20Made%20by%20Sierra%20Electric.jfif-ZaMipho7TuDliZqhJp2H8U3QOYEpNi.jpeg', 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG-20260502-WA0077-5ezEdZC9FiA5rakFUTYGLc8j73stbx.jpg'],
-  workshop: ['https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG-20260503-WA0043-lyvB9V3ek7RLkUS4RGpam0jsk5iXDp.jpg', 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1777656357345-Ken8nCRx0q1CGOaUECASxo92yO2MNg.jpg'],
-  team: ['https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG-20260502-WA0073-YXNqhvvPqrG6BHM1KVhKmlzAv94Kks.jpg', 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1788633601074-tq50vfwHzaSJGLyUoihUUlugoDbn7d.jpg'],
+const projectDetails: Record<string, { details: string[]; focus: string[] }> = {
+  'Electric Shuttle': {
+    details: [
+      'SET built Sierra Leone’s first 100% electric shuttle minibus, designed and built locally.',
+      'The build includes accessibility considerations, a wheelchair ramp and a focus on practical, serviceable transport.',
+      '75% of the shuttle build is reported to use locally sourced materials.',
+      'The shuttle is the flagship of SET’s electric-mobility work and the reference build for future directions like the electric mini-bus.',
+    ],
+    focus: [
+      'Electric mobility',
+      'Accessibility considerations',
+      'Locally sourced build',
+      'Public transport direction',
+    ],
+  },
+  'First Electric Keke': {
+    details: [
+      'SET built an electric Keke that can carry passengers, including people using wheelchairs.',
+      'The conversion builds on tricycle conversion work adapted to Sierra Leonean roads and charging reality.',
+      'It sits alongside the SET / EV-01 shuttle in SET’s accessible electric-mobility family.',
+    ],
+    focus: [
+      'Accessible passenger mobility',
+      'Electric conversion',
+      'Tricycle platform',
+    ],
+  },
+  'Solar Backpack': {
+    details: [
+      'A solar-generating backpack concept that supports study lighting and device charging.',
+      'Designed for education and energy access in off-grid communities.',
+      'The concept connects with the Sierra Circular Energy Initiative’s affordable energy products.',
+    ],
+    focus: [
+      'Solar generation',
+      'Study lighting',
+      'Device charging',
+      'Education and youth',
+    ],
+  },
+  'Device-to-Lamp': {
+    details: [
+      'Repurposing old electronic devices into practical study lamps while reducing e-waste.',
+      'Turns discarded devices into useful lighting for study and home use.',
+      'Part of SET’s circular-economy work alongside battery recovery and repurposing.',
+    ],
+    focus: [
+      'E-waste reduction',
+      'Study lamps',
+      'Circular design',
+    ],
+  },
+  'GreenShift Systems': {
+    details: [
+      'An integrated model connecting solar charging, electric mobility and climate-smart agriculture.',
+      'A flagship blueprint that ties SET’s systems together into one deployable package.',
+      'Presented as a developed blueprint; delivery details and outcomes require confirmation.',
+    ],
+    focus: [
+      'Integrated systems',
+      'Solar charging',
+      'Climate-smart agriculture',
+    ],
+  },
+  'Smart Farm': {
+    details: [
+      'A living site for solar-powered irrigation, weather monitoring, composting and crop-health research.',
+      'A demonstration site where hands-on learning and research come together.',
+      'Supports SET’s smart-agriculture and climate-resilience work.',
+    ],
+    focus: [
+      'Solar-powered irrigation',
+      'Weather monitoring',
+      'Composting',
+      'Crop-health research',
+    ],
+  },
+  'Electric Mini Bus': {
+    details: [
+      'A larger electric public-transport direction building on SET’s shuttle and vehicle engineering work.',
+      'Development direction — recorded honestly as not yet a delivered build.',
+      'Answers a growing need for affordable, climate-friendly public transport.',
+    ],
+    focus: [
+      'Public transport',
+      'Larger vehicle platform',
+      'Shuttle lineage',
+    ],
+  },
+  'Automated Hand-Washing Machine': {
+    details: [
+      'An automated hand-washing concept designed to make hygiene safer, more consistent and easier to access.',
+      'Prototype stage — an example of SET applying engineering skills to public health.',
+      'Part of the wider portfolio of local problem-solving beyond mobility and energy.',
+    ],
+    focus: [
+      'Public health',
+      'Automation',
+      'Prototype',
+    ],
+  },
+  'Sierra Circular Energy Initiative': {
+    details: [
+      'A youth-led circular model repurposing mobile e-waste and solar batteries into affordable solar backpacks, lighting kits and portable charging units for underserved communities.',
+      'Creates technical and collection roles for youth, connecting e-waste recovery with green employment.',
+      'Central to SET’s climate-innovation and GreenShift work.',
+    ],
+    focus: [
+      'E-waste recovery',
+      'Battery repurposing',
+      'Youth employment',
+      'Solar backpacks and lighting',
+    ],
+  },
+  'Electric Farm Vehicle SEFT-V': {
+    details: [
+      'A locally manufacturable four-wheel solar-assisted electric farm vehicle designed for approximately 500 kg of produce, tools and farm transport across rural terrain.',
+      'The validated concept targets a 72-volt lithium-ion battery, an axle-driven motor and assistive solar charging.',
+      'Emphasizes local manufacturing, simple maintenance and lower dependence on fuel for smallholder farmers.',
+    ],
+    focus: [
+      'Farm logistics',
+      'Solar-assisted charging',
+      'Local manufacturing',
+      'Maintenance simplicity',
+    ],
+  },
 }
 
-type Project = { title: string; category: string; summary: string; challenge: string; solution: string; technology: string[]; status: string; impact: string; next: string; gallery?: string[] }
-function galleryForSlug(slug: string) { if (slug === 'electric-shuttle' || slug === 'electric-mini-bus') return photos.shuttle; if (slug === 'first-electric-keke' || slug === 'automated-hand-washing-machine') return photos.workshop; if (slug === 'sierra-circular-energy-initiative') return photos.team; if (slug === 'electric-farm-vehicle-seft-v') return photos.shuttle; return photos.team }
-const projects: Record<string, Project> = {
-  'electric-shuttle': { title: 'Electric Shuttle', category: 'Electric mobility · Built', summary: 'Sierra Leone’s first 100% electric shuttle minibus, developed around local engineering and practical transport needs.', challenge: 'Public transport must become cleaner, quieter and more affordable without losing the familiarity and usefulness of shared mobility.', solution: 'SET designed and built an electric shuttle platform, using local fabrication and engineering to explore accessible, locally maintainable transport.', technology: ['Electric drivetrain', 'Battery systems', 'Vehicle controls', 'Local fabrication'], status: 'Built / deployment details to confirm', impact: 'A working proof point for Sierra Leonean electric mobility and a platform for future public-transport partnerships.', next: 'Confirm passenger capacity, accessibility specification, deployment location, test data and operating results.' },
-  'first-electric-keke': { title: 'First Electric Keke', category: 'Electric mobility · Conversion', summary: 'The first electric Keke built by SET, designed to carry passengers and accommodate people using wheelchairs.', challenge: 'Fuel-powered tricycles are familiar and widely used, but they create fuel costs, emissions and accessibility challenges.', solution: 'SET explored conversion rather than replacement: adapting a familiar Keke platform with an electric system and a more inclusive passenger layout.', technology: ['Electric motor', 'Battery and controller', 'Vehicle wiring', 'Accessible passenger space'], status: 'Built / full technical specification to confirm', impact: 'Demonstrates how existing transport platforms can become cleaner and more inclusive while supporting local maintenance skills.', next: 'Document range, payload, charging, wheelchair-access details, safety testing and commercialization pathway.' },
-  'device-to-lamp': { title: 'Device-to-Lamp', category: 'Circular economy · Education', summary: 'A practical study-lamp concept made by repurposing old electronic devices and recovering useful components.', challenge: 'E-waste is growing while many learners still need reliable, low-cost study lighting.', solution: 'SET turns discarded electronics into useful lighting prototypes, combining repair, reuse and hands-on technical learning.', technology: ['Recovered electronics', 'LED lighting', 'Battery integration', 'Product prototyping'], status: 'Prototype / results to confirm', impact: 'Connects circular economy practice with education, technical skills and a lower-cost approach to study lighting.', next: 'Confirm prototype count, power source, users, test results and pathway for community deployment.' },
-  'solar-backpack': { title: 'Solar Backpack', category: 'Clean energy · Education', summary: 'A solar-generating backpack concept that supports study lighting and device charging.', challenge: 'Learners need portable, resilient access to light and device power.', solution: 'SET explores integrating solar generation and storage into a practical everyday backpack.', technology: ['Solar generation', 'Portable storage', 'LED study light', 'Device charging'], status: 'Pilot / details to confirm', impact: 'Connects clean energy access with education and mobility.', next: 'Confirm power output, battery capacity, prototype testing and users.' },
-  'smart-farm': { title: 'Smart Farm', category: 'Smart agriculture · Demonstration site', summary: 'A living site for solar-powered irrigation, weather monitoring, composting and crop-health research.', challenge: 'Climate resilience requires farms to use water, energy and data more efficiently.', solution: 'SET brings clean energy, monitoring and practical farm systems together in a demonstration environment.', technology: ['Solar irrigation', 'Weather monitoring', 'Composting', 'Crop-health research'], status: 'Demonstration site / details to confirm', impact: 'Shows how climate technology can support food systems and practical learning.', next: 'Confirm site, crops, partners, monitoring data and results.' },
-  'electric-mini-bus': { title: 'Electric Mini Bus', category: 'Electric mobility · Public transport', summary: 'A larger-scale electric public-transport direction building on SET’s shuttle and vehicle engineering work.', challenge: 'Cities need public transport that reduces fuel dependence and emissions while remaining practical for everyday passengers.', solution: 'SET is developing knowledge across vehicle conversion, battery systems, accessibility and local fabrication to support future electric mini-bus deployment.', technology: ['Electric drivetrain', 'Battery management', 'Charging systems', 'Vehicle fabrication'], status: 'Development direction / project details to confirm', impact: 'Creates a pathway from a working electric shuttle toward scalable, locally supported public transport.', next: 'Confirm whether this is a distinct vehicle, its build stage, capacity, route and deployment partners.' },
-  'automated-hand-washing-machine': { title: 'Automated Hand-Washing Machine', category: 'Engineering · Public health', summary: 'An automated hand-washing concept designed to make hygiene safer, more consistent and easier to access.', challenge: 'Public hand-washing requires reliable water delivery while reducing touch points and encouraging consistent use.', solution: 'SET applies local prototyping and simple automation to create a practical, maintainable hand-washing solution.', technology: ['Sensors or controls', 'Water delivery', 'Local fabrication', 'User-centered design'], status: 'Prototype / technical details to confirm', impact: 'Shows how SET’s workshop can respond to practical community needs beyond mobility and energy.', next: 'Confirm activation method, power source, deployment site, water capacity and test outcomes.' },
-  'greenshift-systems': { title: 'GreenShift Systems', category: 'Climate innovation · Integrated systems', summary: 'An integrated model connecting solar charging, electric mobility and climate-smart agriculture.', challenge: 'Climate solutions are strongest when transport, energy, food systems and youth opportunity are designed together.', solution: 'GreenShift links practical climate technologies with innovation training, community projects and pathways to green employment.', technology: ['Solar energy', 'Electric mobility', 'Smart agriculture', 'Climate innovation'], status: 'Flagship blueprint / programme details to confirm', impact: 'Provides a systems-level framework for youth-led climate action and locally relevant green technology.', next: 'Confirm participating communities, delivered projects, partners, results and future programme plans.' },
-  'sierra-circular-energy-initiative': { title: 'Sierra Circular Energy Initiative', category: 'Circular energy · Youth employment', summary: 'A youth-led initiative proposed by Sierra Electric Technologies in collaboration with Wanjama Innovative Salone to repurpose mobile e-waste and solar batteries into affordable clean-energy products.', challenge: 'End-of-life phones, lithium-ion batteries and small solar storage units are often discarded while many underserved communities still lack reliable electricity for study, work and digital access.', solution: 'The initiative creates a circular system for youth-led collection, safe disassembly, battery testing, recovery, product assembly and community distribution. Recovered components can support solar backpacks, portable lighting kits and rechargeable charging units.', technology: ['Battery recovery and testing', 'Solar backpacks', 'Portable lighting kits', 'Rechargeable charging units', 'Youth technician training'], status: 'Pilot proposal · details to confirm', impact: 'The pilot targets recovery of 1,000+ batteries, training for 50+ youth and deployment of 300–500 solar-powered units while reducing e-waste and expanding energy access.', next: 'Confirm pilot communities, safety protocols, battery test methodology, funding, partners and final product specifications.' },
-  'electric-farm-vehicle-seft-v': { title: 'Electric Farm Vehicle SEFT-V', category: 'Smart agriculture · Validated design', summary: 'A locally manufactured solar-assisted four-wheel electric farm vehicle designed for smallholder farmers and rural transport in Sierra Leone.', challenge: 'Poor rural roads, high fuel costs and limited access to farm transport make it difficult to move produce, tools and people from farms to markets and processing centres.', solution: 'SEFT-V uses a reinforced, locally manufacturable frame, an axle-driven variable-speed motor and a 72-volt lithium-ion battery. Solar charging is designed as an assistive system, while approximately 70% of components are intended to be sourced locally.', technology: ['Four-wheel electric farm cart', 'Approximately 500 kg load capacity', 'Axle-driven electric motor', '72V lithium-ion battery', 'Assistive solar charging'], status: 'Design validated · prototype phase next', impact: 'Creates a practical pathway toward lower-cost farm logistics, local manufacturing, easier maintenance and reduced dependence on fuel.', next: 'Confirm prototype schedule, final engineering drawings, supplier partnerships, field-test farmers and performance results.' },
+export function generateStaticParams() {
+  return projects.map((project) => ({
+    slug: projectHref(project.title).replace('/projects/', ''),
+  }))
 }
 
-export function generateStaticParams() { return Object.keys(projects).map((slug) => ({ slug })) }
-
-export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ProjectPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
   const { slug } = await params
-  const project = projects[slug] ?? projects['electric-shuttle']
-  const gallery = project.gallery ?? galleryForSlug(slug)
-  return <main className="project-detail-page"><header className="site-header"><Link className="brand" href="/"><img className="brand-logo" src={logo} alt="Sierra Electric Technologies logo" /><span>SIERRA ELECTRIC<br /><b>TECHNOLOGIES</b></span></Link><Link className="pill-button outline" href="/#projects"><ArrowLeft size={15} /> Back to projects</Link></header><section className="project-detail-hero section-pad"><span className="eyebrow"><span className="eyebrow-dot" /> Project case study</span><p className="project-detail-category">{project.category}</p><h1>{project.title}</h1><p className="project-detail-summary">{project.summary}</p><span className="status-pill"><span className="status-dot" />{project.status}</span></section><section className="project-gallery section-pad"><div><span className="kicker">Project views</span><h2>See the work from <em>every angle.</em></h2></div><div className="project-gallery-grid">{gallery.map((image, index) => <img key={image} src={image} alt={`${project.title} project view ${index + 1}`} />)}</div></section><section className="project-detail-body section-pad"><div className="project-detail-intro"><span className="kicker">Inside the work</span><h2>From challenge to <em>practical solution.</em></h2></div><div className="project-detail-copy"><article><span className="kicker">The challenge</span><p>{project.challenge}</p></article><article><span className="kicker">The solution</span><p>{project.solution}</p></article><article><span className="kicker">Impact</span><p>{project.impact}</p></article><article><span className="kicker">What comes next</span><p>{project.next}</p></article></div></section><section className="project-tech-section section-pad"><div><span className="kicker light-kicker">Technology and build</span><h2>Built with local <em>purpose.</em></h2></div><div className="project-tech-list">{project.technology.map((item) => <div key={item}><CheckCircle2 size={18} /><span>{item}</span></div>)}</div></section><section className="project-detail-cta section-pad"><span className="kicker">Need the complete project file?</span><h2>Ask SET for the <em>technical record.</em></h2><p>Some project specifications, dates, partners, measurements and photographs are still marked for confirmation. Contact SET for the verified project information as it becomes available.</p><Link className="pill-button primary" href="/#contact">Request project information <ArrowRight size={15} /></Link></section></main>
+  const project = projects.find((p) => projectHref(p.title).endsWith(slug)) ?? projects[0]
+  const details =
+    projectDetails[project.title] ?? {
+      details: [project.description],
+      focus: [project.tag],
+    }
+
+  return (
+    <>
+      <Navbar />
+      <main>
+        <section className="detail-hero container">
+          <Link className="btn btn-text" href="/research">
+            <ArrowLeft size={15} aria-hidden="true" /> Back to research
+          </Link>
+          <p className="detail-category">{project.tag}</p>
+          <h1>{project.title}</h1>
+          <p className="detail-summary">{project.description}</p>
+        </section>
+
+        <section className="section">
+          <div className="container">
+            <div className="detail-body">
+              <div className="detail-intro">
+                <p className="section-head__meta">
+                  <span className="cell-idx">Project</span>
+                  <span className="kicker">The file</span>
+                </p>
+                <h2>
+                  What this record <em>covers.</em>
+                </h2>
+              </div>
+              <div className="detail-copy">
+                {details.details.map((detail) => (
+                  <article key={detail}>
+                    <CheckCircle2 size={18} aria-hidden="true" />
+                    <p>{detail}</p>
+                  </article>
+                ))}
+                <div className="focus-box">
+                  <span className="lead">In this record</span>
+                  {details.focus.map((item) => (
+                    <div className="focus-item" key={item}>
+                      <CheckCircle2 size={16} aria-hidden="true" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="detail-cta">
+          <span className="kicker">
+            <span className="eyebrow-dot" aria-hidden="true" /> Partner with SET
+          </span>
+          <h2>
+            Let&apos;s build the <em>next one together.</em>
+          </h2>
+          <p>
+            Request the verified project brief, references or partnership options from the team.
+          </p>
+          <Link className="btn btn-primary" href="/contact">
+            <span>Start a conversation</span>
+            <ArrowRight size={15} aria-hidden="true" />
+          </Link>
+        </section>
+      </main>
+      <Footer />
+    </>
+  )
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) { const { slug } = await params; const project = projects[slug] ?? projects['electric-shuttle']; return { title: `${project.title} | Sierra Electric Technologies`, description: project.summary } }
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const project = projects.find((p) => projectHref(p.title).endsWith(slug)) ?? projects[0]
+  return { title: project.title, description: project.description }
+}

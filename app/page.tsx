@@ -1,96 +1,362 @@
-'use client'
+import { ArrowRight, Recycle, Sprout, Sun, Zap } from 'lucide-react'
+import { Navbar } from '@/components/Navbar'
+import { Footer } from '@/components/Footer'
+import { SectionHeading } from '@/components/SectionHeading'
+import { Button } from '@/components/Button'
+import { Badge } from '@/components/Badge'
+import { Reveal } from '@/components/Reveal'
+import { Counter } from '@/components/Counter'
+import {
+  featuredProject,
+  images,
+  impactStats,
+  projectHref,
+  projects,
+  services,
+} from '@/lib/site'
 
-import { useState } from 'react'
-import { ArrowRight, Check, Mail, MapPin, Menu, MoveUpRight, Phone, X } from 'lucide-react'
+const serviceIcons: Record<string, typeof Zap> = {
+  'electric-mobility': Zap,
+  'clean-energy': Sun,
+  'smart-agriculture': Sprout,
+  'climate-innovation': Recycle,
+}
 
-const logo = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1776285047875-mvtv8fMkk7osjEWCypeWq12mH6xUoD.jpg'
-const shuttle = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/10%20Passenger%20E%20car%20for%20Africell%20Made%20by%20Sierra%20Electric.jfif-ZaMipho7TuDliZqhJp2H8U3QOYEpNi.jpeg'
-const workshop = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG-20260811-WA0016-Yig3FYAvJI3CxTFC47olxk8ZZVTkaZ.jpg'
-const engineer = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1786993801626-l1z3FnX2M1ZM9KAvn4rafgclZAFQ7g.jpg'
-const blackVehicle = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/0f360a7e-ec58-4bb6-9d73-f39bc5d453df%20%281%29.jfif-xN5PgLAjYsfbRMkXdFvidbMRQpcTDR.jpeg'
-const specialGuest = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1777063666742-Kd3R5Bczi6WMSLVb8JCZHOqiWD8NsJ.jpg'
-const youngBuilder = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_20260703_042354_068-NXAEgW5Ng0MzHdxAyGB27dLbaz7mGe.jpg'
-const guestPortrait = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1777063666742-Kd3R5Bczi6WMSLVb8JCZHOqiWD8NsJ.jpg'
-const trainingRoom = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1777656357345-Ken8nCRx0q1CGOaUECASxo92yO2MNg.jpg'
-const panel = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1788633531253-c3uenFU6ChUVvBRDVkEfrI0CSDUbTW.jpg'
-const workshopTeam = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG-20260502-WA0077-5ezEdZC9FiA5rakFUTYGLc8j73stbx.jpg'
-const recognition = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG-20260502-WA0073-YXNqhvvPqrG6BHM1KVhKmlzAv94Kks.jpg'
-const greenshiftGroup = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1788633601074-tq50vfwHzaSJGLyUoihUUlugoDbn7d.jpg'
-
-const nav = [
-  ['About', '#about'], ['What we do', '#work'], ['Projects', '#projects'],
-  ['Programmes', '#programmes'], ['People', '#people'], ['Contact', '#contact'],
+const indexPages = [
+  {
+    number: '01',
+    title: 'About',
+    blurb: 'Who we are, our story, key facts and a transparent institutional profile.',
+    href: '/about',
+  },
+  {
+    number: '02',
+    title: 'Our Approach',
+    blurb: 'Electric mobility, clean energy, smart agriculture, climate innovation and how we work.',
+    href: '/approach',
+  },
+  {
+    number: '03',
+    title: 'The Team',
+    blurb: 'The people behind the builds — and the pathways to join them.',
+    href: '/team',
+  },
+  {
+    number: '04',
+    title: 'Research',
+    blurb: 'Builds, pilots and concept records, plus R&D and training programmes.',
+    href: '/research',
+  },
+  {
+    number: '05',
+    title: 'For Investors',
+    blurb: 'Track record, growth directions, roadmap and partnership opportunities.',
+    href: '/investors',
+  },
+  {
+    number: '06',
+    title: 'Contact',
+    blurb: 'Partnerships, support, research and a direct message to the team.',
+    href: '/contact',
+  },
 ]
-const work = [
-  ['01', 'Electric mobility', 'Electric bikes, tricycles and shuttle systems adapted for Sierra Leonean realities.'],
-  ['02', 'Clean energy', 'Solar systems, storage and energy access solutions designed for resilience.'],
-  ['03', 'Smart agriculture', 'Irrigation, monitoring and EV-supported farm logistics for climate resilience.'],
-  ['04', 'Climate innovation', 'Youth-led circular economy, climate entrepreneurship and community solutions.'],
-]
-const projects = [
-  ['Electric Shuttle', 'Built / mobility', 'Sierra Leone’s first 100% electric shuttle minibus, with accessibility considerations and 75% locally sourced materials.', shuttle],
-  ['First Electric Keke', 'Built / accessible mobility', 'SET built an electric Keke that can carry passengers, including people using wheelchairs.'],
-  ['Solar Backpack', 'Pilot / energy + education', 'A solar-generating backpack concept that supports study lighting and device charging.'],
-  ['Device-to-Lamp', 'Circular economy', 'Repurposing old electronic devices into practical study lamps while reducing e-waste.'],
-  ['GreenShift Systems', 'Flagship blueprint', 'An integrated model connecting solar charging, electric mobility and climate-smart agriculture.'],
-  ['Smart Farm', 'Demonstration site', 'A living site for solar-powered irrigation, weather monitoring, composting and crop-health research.'],
-  ['Electric Mini Bus', 'Development direction / mobility', 'A larger electric public-transport direction building on SET’s shuttle and vehicle engineering work.'],
-  ['Automated Hand-Washing Machine', 'Prototype / public health', 'An automated hand-washing concept designed to make hygiene safer, more consistent and easier to access.'],
-  ['Sierra Circular Energy Initiative', 'Circular energy / youth employment', 'A youth-led circular model repurposing mobile e-waste and solar batteries into affordable solar backpacks, lighting kits and portable charging units for underserved communities.'],
-  ['Electric Farm Vehicle SEFT-V', 'Validated design / smart agriculture', 'A locally manufacturable four-wheel solar-assisted electric farm vehicle designed for approximately 500 kg of produce, tools and farm transport across rural terrain.'],
-]
-const faqs = [
-  ['What is Sierra Electric Technologies?', 'SET SL is a youth-led Sierra Leonean technology and engineering company developing practical solutions across electric mobility, clean energy, sustainable agriculture and climate innovation.'],
-  ['Does SET build electric vehicles?', 'Yes. SET built Sierra Leone’s first 100% electric shuttle minibus and continues to develop and test electric mobility and conversion concepts.'],
-  ['Can organizations partner with SET?', 'Yes. We welcome conversations with government, funders, NGOs, universities, businesses, technology companies and research partners.'],
-  ['Does SET offer training?', 'SET develops technical skills and green-employment pathways. Programme availability and application windows should be confirmed directly with the team.'],
-  ['How can I contact SET?', 'Use the contact options in the contact section below to reach the SET team.'],
-]
 
-function Mark({ light = false }: { light?: boolean }) { return <img className={`brand-logo ${light ? 'brand-logo-light' : ''}`} src={logo} alt="Sierra Electric Technologies logo" /> }
-function Button({ children, href = '#', outline = false }: { children: React.ReactNode; href?: string; outline?: boolean }) { return <a className={`pill-button ${outline ? 'outline' : 'primary'}`} href={href}>{children}<ArrowRight size={16} /></a> }
-function SectionTitle({ kicker, title, children }: { kicker: string; title: React.ReactNode; children?: React.ReactNode }) { return <div className="section-heading-row"><div><span className="kicker">{kicker}</span><h2>{title}</h2></div>{children}</div> }
+function Hero() {
+  return (
+    <section className="hero container" id="top">
+      <div className="hero-copy">
+        <span className="eyebrow">
+          <span className="eyebrow-dot" aria-hidden="true" /> Youth-led climate technology
+        </span>
+        <h1>
+          Engineering a <em>cleaner, smarter</em> future.
+        </h1>
+        <p className="hero-sub">
+          Sierra Electric Technologies builds practical clean-energy, electric-mobility,
+          agricultural and climate solutions for Sierra Leone and Africa — moving from problem to
+          prototype to deployment.
+        </p>
+        <div className="hero-actions">
+          <Button href="/research" arrow>
+            Explore our work
+          </Button>
+          <Button href="/about" variant="ghost">
+            About SET
+          </Button>
+        </div>
+        <div className="hero-facts">
+          <div className="hero-fact">
+            <b>100%</b>
+            <span>First electric shuttle built in Sierra Leone</span>
+          </div>
+          <div className="hero-fact">
+            <b>2024</b>
+            <span>National Innovation Challenge winner</span>
+          </div>
+          <div className="hero-fact">
+            <b>2025</b>
+            <span>MOCTI Young Innovator of the Year</span>
+          </div>
+        </div>
+      </div>
 
-export default function Page() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [sent, setSent] = useState(false)
-  function sendMessage(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    const form = new FormData(event.currentTarget)
-    const subject = String(form.get('title') || 'Website enquiry')
-    const interest = String(form.get('interest') || 'General enquiry')
-    const message = String(form.get('message') || '')
-    const body = `Interest: ${interest}\n\n${message}`
-    window.location.href = `mailto:sierraelectric.sl@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-    setSent(true)
-  }
-  return <main className="motion-page">
-    <header className="site-header"><a className="brand" href="#top" aria-label="Sierra Electric Technologies home"><Mark /><span>SIERRA ELECTRIC<br /><b>TECHNOLOGIES</b></span></a><nav id="mobile-navigation" className={`desktop-nav ${menuOpen ? 'is-open' : ''}`} aria-label="Main navigation">{nav.map(([label, href]) => <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}</a>)}<Button href="#contact">Partner with us</Button></nav><div className="header-actions"><button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen}>{menuOpen ? <X /> : <Menu />}</button></div></header>
+      <div className="hero-visual">
+        <figure className="hero-photo">
+          <img
+            src={images.shuttle}
+            alt="A SET electric shuttle built in Sierra Leone"
+            width={640}
+            height={460}
+            fetchPriority="high"
+          />
+          <span className="hero-chip hero-chip--tl" aria-hidden="true">
+            <span className="signal" />
+            <span>
+              SET / EV-01
+              <br />
+              Locally built
+            </span>
+          </span>
+          <span className="hero-chip hero-chip--br" aria-hidden="true">
+            <span>
+              <b>75% locally sourced</b>
+              materials · shuttle build
+            </span>
+          </span>
+          <figcaption className="hero-caption">
+            <span className="hero-caption__code">SET / EV-01</span>
+            <p>First 100% electric vehicle built in Sierra Leone · built in Sierra Leone</p>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+  )
+}
 
-    <section className="hero section-pad motion-section" id="top"><div className="hero-copy"><span className="eyebrow"><span className="eyebrow-dot" /> Youth-led climate technology</span><h1>Engineering a <em>cleaner, smarter</em> future.</h1><p className="hero-sub">Sierra Electric Technologies builds practical clean-energy, electric-mobility, agricultural and climate solutions for Sierra Leone and Africa — moving from problem to prototype to deployment.</p><div className="hero-actions"><Button href="#projects">Explore our work</Button><Button href="#about" outline>Discover SET</Button></div><a className="text-link" href="#contact">Let&apos;s build what comes next <MoveUpRight size={15} /></a><div className="workshop-story" aria-hidden="true"><div className="story-header"><span className="story-signal" />Workshop in motion</div><div className="story-floor"><span className="engineer engineer-one"><i /><b /></span><span className="engineer engineer-two"><i /><b /></span><span className="parts parts-one"><i /><i /><i /></span><span className="parts parts-two"><i /><i /></span><span className="built-object" /></div><span className="story-caption">gather · repair · build</span></div></div><figure className="hero-visual hero-photo"><img className="hero-photo-image" src={shuttle} alt="A SET electric shuttle inside the workshop" /><figcaption className="hero-photo-caption"><strong>SET / EV-01</strong><span>First electric vehicle built in Sierra Leone · built in Sierra Leone</span></figcaption></figure></section>
+function IndexPick() {
+  return (
+    <section className="section-tight container" id="sections">
+      <Reveal>
+        <p className="section-head__meta">
+          <span className="cell-idx">Index</span>
+          <span className="kicker">Everything on the site</span>
+        </p>
+      </Reveal>
+      <div className="index-grid">
+        {indexPages.map((page, i) => (
+          <Reveal key={page.title} delay={i * 60} className="grid-reveal">
+            <a className="index-card" href={page.href}>
+              <span className="index-card__top">
+                <span className="cell-idx">{page.number}</span>
+                <ArrowRight size={16} aria-hidden="true" />
+              </span>
+              <h3>{page.title}</h3>
+              <p>{page.blurb}</p>
+            </a>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  )
+}
 
-    <section className="capabilities section-pad motion-section" id="work"><div className="section-intro"><span className="kicker">What SET does</span><h2>Technology made for <em>real-world impact.</em></h2><p>Our systems-thinking approach connects energy, mobility, agriculture, engineering and people — moving from problem to prototype to deployment.</p></div><div className="capability-grid">{work.map(([number, title, text]) => <article className="capability-card" key={title}><div className="icon-chip"><span>{number}</span></div><h3>{title}</h3><p>{text}</p><a className="card-link" href={`/work/${title.toLowerCase().replaceAll(' ', '-')}`}>Explore <ArrowRight size={15} /></a></article>)}</div></section>
+function Services() {
+  return (
+    <section className="section section-alt" id="services">
+      <div className="container">
+        <SectionHeading
+          index="02"
+          kicker="What SET does"
+          title={
+            <>
+              Technology made for <em>real-world impact.</em>
+            </>
+          }
+          description="Our systems-thinking approach connects energy, mobility, agriculture, engineering and people — moving from problem to prototype to deployment."
+        >
+          <Button href="/approach" variant="ghost" size="sm" arrow>
+            All capabilities & approach
+          </Button>
+        </SectionHeading>
+        <div className="services-grid">
+          {services.map((service, i) => {
+            const Icon = serviceIcons[service.slug]
+            return (
+              <Reveal key={service.slug} delay={i * 70} className="grid-reveal">
+                <article className="service-card">
+                  <span className="service-card__num">{service.number}</span>
+                  <div className="service-card__icon">
+                    <Icon size={21} aria-hidden="true" />
+                  </div>
+                  <h3>{service.title}</h3>
+                  <p>{service.description}</p>
+                  <a className="service-card__link" href={`/work/${service.slug}`}>
+                    Explore capability <ArrowRight size={14} aria-hidden="true" />
+                  </a>
+                </article>
+              </Reveal>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
 
-    <section className="dark-section section-pad" id="about"><div className="dark-grid"><div><span className="kicker light-kicker">Who we are</span><h2>Local problems deserve <em>local engineering.</em></h2></div><div><p className="dark-lead">Incorporated on 29 July 2023, Sierra Electric Technologies Ltd. is a youth-led climate-technology and engineering company headquartered in Freetown, Sierra Leone.</p><p className="about-detail">We design and build practical solutions for the realities people face every day: expensive fuel, unreliable electricity, difficult rural transport, growing e-waste and climate pressure on food systems. Our work connects electric mobility, solar energy, circular design, smart agriculture and skills development.</p><p className="about-detail">SET moves deliberately from listening and research to engineering, prototyping, testing and deployment. We work with young builders, communities, institutions and partners to turn local challenges into useful products, services and pathways to green employment across Sierra Leone and Africa.</p><ul className="check-list"><li><Check size={16} /> 75% locally sourced shuttle build</li><li><Check size={16} /> 2024 National Innovation Challenge winner</li><li><Check size={16} /> 2025 MOCTI Young Innovator of the Year recognition</li></ul><Button href="#contact">Partner with SET</Button></div></div></section>
+function Featured() {
+  return (
+    <section className="section" id="projects">
+      <div className="container">
+        <SectionHeading
+          index="03"
+          kicker="Flagship build"
+          title={
+            <>
+              Sierra Leone&apos;s first 100% <em>electric shuttle.</em>
+            </>
+          }
+        >
+          <Button href="/research" variant="ghost" size="sm" arrow>
+            Full portfolio
+          </Button>
+        </SectionHeading>
 
-    <section className="feature-strip section-pad"><span>Problem</span><i /><span>Research</span><i /><span>Prototype</span><i /><span>Testing</span><i /><span>Deployment</span><i /><span>Impact</span></section>
+        <Reveal>
+          <article className="featured">
+            <div className="browser-bar" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+              <p>
+                SET / EV-01 <span className="browser-code">· electric-mobility</span>
+              </p>
+            </div>
+            <div className="featured-inner">
+              <div className="featured-copy">
+                <Badge tone="accent">{featuredProject.status}</Badge>
+                <h3>{featuredProject.title}</h3>
+                <p>{featuredProject.caseStudy}</p>
+                <div className="featured-meta">
+                  {featuredProject.meta.map((item) => (
+                    <span key={item}>{item}</span>
+                  ))}
+                </div>
+                <Button href={featuredProject.href} arrow>
+                  Read the case study
+                </Button>
+              </div>
+              <div className="featured-visual">
+                <img src={featuredProject.image} alt={featuredProject.imageAlt} loading="lazy" />
+              </div>
+            </div>
+          </article>
+        </Reveal>
 
-    <section className="projects-section section-pad motion-section" id="projects"><SectionTitle kicker="Complete project portfolio" title={<>Proof in <em>progress.</em></>}><a className="text-link" href="#contact">Request project details <ArrowRight size={15} /></a></SectionTitle><p className="portfolio-note">More project photos, technical documents, field results and partner information will be added as they are uploaded and verified.</p><div className="project-browser"><div className="browser-bar"><span /><span /><span /><p>set.sl / projects / electric-shuttle</p><span className="browser-code">01 — 06</span></div><div className="project-feature"><div className="project-feature-copy"><span className="status-pill"><span /> Built / verified</span><h3>Electric<br /><em>Shuttle</em></h3><p>Sierra Leone’s first 100% electric shuttle minibus, designed and built locally with a wheelchair ramp and accessibility in mind.</p><div className="project-meta"><span>Electric mobility</span><span>Freetown, Sierra Leone</span></div><a href="/projects/electric-shuttle" className="card-link">Read the full case study <ArrowRight size={15} /></a></div><div className="project-visual project-real-photo"><img src={shuttle} alt="Pink 10-passenger electric vehicle built by Sierra Electric Technologies" /></div></div></div><div className="project-cards">{projects.slice(1).map(([title, tag, text]) => <article className="project-card" key={title}><div className="project-thumb project-thumb-empty"><span className="status-pill">{tag}</span></div><div className="project-card-copy"><span className="kicker">{title}</span><p>{text}</p><a className="card-link" href={`/projects/${title === 'Electric Farm Vehicle SEFT-V' ? 'electric-farm-vehicle-seft-v' : title.toLowerCase().replaceAll(' ', '-').replaceAll('—', '').replaceAll('·', '')}`}>Project information <ArrowRight size={15} /></a></div></article>)}</div></section>
+        <div className="project-grid">
+          {projects.slice(1, 4).map((project, i) => (
+            <Reveal key={project.title} delay={(i % 3) * 70} className="grid-reveal">
+              <article className="project-card">
+                {project.image ? (
+                  <div className="project-card__media">
+                    <img src={project.image} alt={project.imageAlt} loading="lazy" />
+                    <Badge>{project.tag}</Badge>
+                  </div>
+                ) : (
+                  <div className="project-card__media">
+                    <div className="figure-pending">
+                      <span>Figure to be supplied</span>
+                    </div>
+                    <Badge>{project.tag}</Badge>
+                  </div>
+                )}
+                <div className="project-card__body">
+                  <span className="kicker">{project.tag}</span>
+                  <h3>{project.title}</h3>
+                  <p>{project.description}</p>
+                  <a className="project-card__link" href={projectHref(project.title)}>
+                    Project file <ArrowRight size={14} aria-hidden="true" />
+                  </a>
+                </div>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
 
-    <section className="people-section section-pad" id="people"><SectionTitle kicker="People and leadership" title={<>Young people, <em>serious builders.</em></>}><p className="people-intro">SET is powered by young engineers, operators, programme builders and collaborators. Confirmed public profiles are shown below; additional names and biographies are marked for confirmation.</p></SectionTitle><div className="people-grid"><article className="person-card person-feature"><div className="person-photo person-portrait"><img src={engineer} alt="James Samba, founder of Sierra Electric Technologies, in engineering safety gear" /></div><div className="person-copy"><span className="kicker">Founder &amp; CEO</span><h3>James Samba</h3><p>Founder, technology builder and 2025 MOCTI Young Innovator of the Year. His journey from experimenting with discarded electronics to electric mobility anchors SET&apos;s culture of curiosity and practical engineering.</p></div></article><article className="person-card"><div className="person-photo person-photo-placeholder"><span>Photo to be supplied</span></div><div className="person-copy"><span className="kicker">Co-Founder &amp; Co-CEO</span><h3>Ms. Mariama Salmana Bah</h3><p>Founder and Co-Chief Executive Officer, responsible for business development, growth, partnerships and strategic leadership across Sierra Electric Technologies Ltd. and its subsidiary venture, Speed Networks Ltd.</p></div></article><article className="person-card"><div className="person-photo person-portrait"><img src={youngBuilder} alt="Samuel Samura, Administrative Officer and Software Engineer at Sierra Electric Technologies" /></div><div className="person-copy"><span className="kicker">Administrative Officer &amp; Software Engineer</span><h3>Samuel Samura</h3><p>A relentless Sierra Leonean builder and problem-solver working across engineering, technology, startups and leadership. Samuel helps turn ambitious ideas into practical systems while studying at Fourah Bay College.</p></div></article><article className="person-card"><div className="person-photo"><img src={shuttle} alt="SET engineering team workspace and electric vehicle" /></div><div className="person-copy"><span className="kicker">Engineering team</span><h3>Builders in the workshop</h3><p>Information required: confirm chief engineer, engineers, operations team, programme team, advisors and mentors.</p></div></article><article className="person-card"><div className="person-photo person-photo-placeholder"><span>Photo to be supplied</span></div><div className="person-copy"><span className="kicker">Chief Engineer &amp; Architect</span><h3>Leadership profile</h3><p>Information required: confirm this person&apos;s name, biography, engineering responsibilities and architectural/design role.</p></div></article><article className="person-card"><div className="person-photo person-photo-placeholder"><span>Team photo to be supplied</span></div><div className="person-copy"><span className="kicker">The SET team</span><h3>People behind the work</h3><p>Information required: upload a team photo and confirm the names, roles and programme responsibilities of the wider team.</p></div></article></div><div className="workspace-strip"><div><span className="kicker">Our workspace</span><h3>The workshop is where ideas become <em>working solutions.</em></h3><p>Visitors, partners and collaborators meet the team around vehicles, wiring, fabrication and experiments — not just presentations.</p></div><div className="workspace-images"><img src={workshop} alt="SET workshop interior" /><img src={blackVehicle} alt="SET electric vehicle outside a partner location" /><img src={engineer} alt="SET engineer in safety equipment" /></div></div></section>
+function Impact() {
+  return (
+    <section className="section section-alt" id="impact">
+      <div className="container">
+        <SectionHeading
+          index="04"
+          kicker="Impact and recognition"
+          title={
+            <>
+              Proof, not <em>promises.</em>
+            </>
+          }
+          description="We distinguish verified achievements from pilots, concepts and future plans. Impact reporting will expand as SET confirms project data."
+        />
+        <div className="impact-grid">
+          {impactStats.map((stat, i) => (
+            <Reveal key={stat.label} delay={(i % 3) * 70} className="grid-reveal">
+              <div className="stat-card">
+                <b>{stat.value === '75%' ? <Counter to={75} suffix="%" /> : stat.value}</b>
+                <span>{stat.label}</span>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
 
-    <section className="media-journal section-pad" id="media"><SectionTitle kicker="Stories from the field" title={<>SET in motion, <em>in the room.</em></>}><a className="text-link" href="#contact">Share a story <ArrowRight size={15} /></a></SectionTitle><div className="media-grid"><article className="media-card media-card-large"><img src={specialGuest} alt="A special guest visits the Sierra Electric Technologies workshop and meets the team" /><div><span className="kicker">A visit from Pontus Edenberg</span><p>Pontus Edenberg, CEO of Swedish technology company Twingly, visited SET&apos;s workshop to meet the team and see locally built electric-mobility work up close. Twingly provides API-based media intelligence data across news, blogs, forums and reviews; his visit reflects the value of connecting Sierra Leonean builders with international technology leaders.</p></div></article><article className="media-card"><img src={greenshiftGroup} alt="GreenShift participants celebrating together in 2025" /><div><span className="kicker">GreenShift</span><p>Youth climate innovators gathering, learning and building community.</p></div></article><article className="media-card"><img src={trainingRoom} alt="SET team members and trainees working together in a training room" /><div><span className="kicker">Training in the room</span><p>Practical learning, technical confidence and collaboration.</p></div></article><article className="media-card"><img src={workshopTeam} alt="SET team working around electric vehicle components in the workshop" /><div><span className="kicker">Workshop at Freetown Innovation Lab</span><p>Engineering teams examine batteries, wiring and mobility systems.</p></div></article><article className="media-card"><img src={panel} alt="SET team members speaking on a public panel" /><div><span className="kicker">On television and in public</span><p>SET&apos;s climate and technology work reaches wider conversations.</p></div></article><article className="media-card"><img src={recognition} alt="SET team members holding a STEM Africa Fest certificate of recognition" /><div><span className="kicker">Recognition and milestones</span><p>Team achievements that document SET&apos;s growing ecosystem.</p></div></article></div></section>
+function HomeCta() {
+  return (
+    <section className="section container">
+      <Reveal>
+        <div className="home-cta">
+          <span className="kicker">
+            <span className="eyebrow-dot" aria-hidden="true" /> Build with SET
+          </span>
+          <h2>
+            Build the next <em>practical solution.</em>
+          </h2>
+          <p>
+            Partner, invest, support, join or research with Sierra Electric Technologies. The team
+            will hear from you.
+          </p>
+          <div className="home-cta__actions">
+            <Button href="/contact" arrow>
+              Partner with us
+            </Button>
+            <Button href="/team" variant="ghost" arrow>
+              Join the team
+            </Button>
+          </div>
+        </div>
+      </Reveal>
+    </section>
+  )
+}
 
-  <section className="programmes section-pad" id="programmes"><div className="programme-copy"><span className="kicker">Programmes and skills</span><h2>Building the skills behind a <em>greener future.</em></h2><p>GreenShift develops youth climate innovation. FORGE creates practical pathways for women into welding, fabrication, EV wiring and green employment.</p><Button href="#contact">Discuss a programme</Button></div><div className="programme-stack"><a href="/programmes/forge" className="programme-card forge"><span className="programme-number">01</span><span className="status-pill">Status to confirm</span><h3>FORGE</h3><p>Fabrication, Operations and Roads to Green Employment. Six-week women-focused technical training concept.</p><span className="card-link">Programme information <ArrowRight size={15} /></span></a><a href="/programmes/greenshift" className="programme-card greenshift"><span className="programme-number">02</span><span className="status-pill">SET-associated initiative</span><h3>GreenShift</h3><p>Youth climate innovation across mobility, clean energy, agriculture and community solutions.</p><span className="card-link">Programme information <ArrowRight size={15} /></span></a></div></section>
-
-    <section className="impact-section section-pad" id="impact"><div className="section-intro"><span className="kicker">Impact and recognition</span><h2>Proof, not <em>promises.</em></h2><p>We distinguish verified achievements from pilots, concepts and future plans. Impact reporting will expand as SET confirms project data.</p></div><div className="stats-grid"><div><b>01</b><span>First 100% electric vehicle built in Sierra Leone</span></div><div><b>75%</b><span>Locally sourced materials reported for the shuttle build</span></div><div><b>2024</b><span>National Innovation Challenge winner</span></div><div><b>2025</b><span>MOCTI Young Innovator of the Year recognition</span></div><div><b>Info</b><span>CO₂, jobs, trainees, beneficiaries and deployment data required for confirmation</span></div><div><b>SDGs</b><span>Aligned with SDGs 2, 7, 8, 11 and 13 and Africa Agenda 2063</span></div></div></section>
-
-    <section className="directory-section section-pad" id="directory"><SectionTitle kicker="Everything a partner needs" title={<>A transparent <em>institutional profile.</em></>} /><div className="directory-grid">{[['Research & development', 'EV systems, batteries, solar, agriculture technology, sensors, IoT, AI and embedded systems.'], ['Customers & services', 'Current commercial products, fabrication, engineering, energy, training and consulting scope requires confirmation.'], ['Partnerships', 'Government, universities, NGOs, development partners, funders, private sector and research collaborators.'], ['Careers', 'Technical roles, internships, apprenticeships, volunteers and programme opportunities — availability requires confirmation.'], ['Future roadmap', 'Local expansion, GreenShift pilots, manufacturing, training, regional replication and new climate technologies.'], ['Media & press', 'Awards, interviews, photos, videos, press releases and downloadable press kit require confirmation and curation.']].map(([title, text]) => <article className="directory-card" key={title}><h3>{title}</h3><p>{text}</p><span className="status-pill">Information / status to confirm</span></article>)}</div></section>
-
-    <section className="faq-section section-pad" id="faq"><SectionTitle kicker="Frequently asked questions" title={<>Start with the <em>facts.</em></>} /><div className="faq-list">{faqs.map(([question, answer]) => <details key={question}><summary>{question}<span>+</span></summary><p>{answer}</p></details>)}</div></section>
-
-    <section className="contact-page section-pad" id="contact"><div className="contact-page-intro"><span className="kicker">Contact Sierra Electric Technologies</span><h2>Tell us what you&apos;re <em>building.</em></h2><p>Whether you want to invest, share feedback, offer support, donate, explore research, discuss a particular project, or partner with us, send a direct message and the SET team will hear from you.</p></div><form className="contact-form" onSubmit={sendMessage}><label htmlFor="title">Title<input id="title" name="title" required placeholder="How can we work together?" /></label><label htmlFor="interest">I am interested in<select id="interest" name="interest" defaultValue="partnership"><option value="partnership">Partnering with SET</option><option value="investment">Investing in SET</option><option value="feedback">Sharing feedback</option><option value="support">Offering support</option><option value="donation">Making a donation</option><option value="research">Research or collaboration</option><option value="project">A particular project</option><option value="programme">A programme or training</option><option value="media">Media or speaking</option><option value="other">Something else</option></select></label><label htmlFor="message">Message<textarea id="message" name="message" required rows={6} placeholder="Tell us what you would like to build, support or explore." /></label><button className="pill-button" type="submit">Send message <ArrowRight size={16} /></button>{sent && <p className="form-note" role="status">Your email app should open with the message addressed to SET. If it does not, email sierraelectric.sl@gmail.com directly.</p>}</form></section>
-
-    <footer className="site-footer" id="footer"><div className="footer-main"><div className="footer-identity"><a className="brand brand-footer" href="#top"><Mark light /><span>SIERRA ELECTRIC<br /><b>TECHNOLOGIES</b></span></a><p>A Sierra Leonean technology and engineering company building practical solutions for a cleaner, smarter future.</p></div><div className="contact-actions footer-contact-actions" aria-label="SET contact options"><a className="contact-icon" href="mailto:sierraelectric.sl@gmail.com" aria-label="Email Sierra Electric Technologies" title="Email Sierra Electric Technologies"><Mail size={22} /></a><a className="contact-icon" href="tel:+23280247163" aria-label="Call Sierra Electric Technologies" title="Call Sierra Electric Technologies"><Phone size={22} /></a><a className="contact-icon" href="https://maps.google.com/?q=1+Sesay+Drive+off+Fadika+Drive+Imatt+Freetown+Sierra+Leone" target="_blank" rel="noreferrer" aria-label="Open SET location in Google Maps" title="Open location in Google Maps"><MapPin size={22} /></a><a className="contact-icon contact-facebook" href="https://www.facebook.com/sierraelectricsl" target="_blank" rel="noreferrer" aria-label="Visit Sierra Electric Technologies on Facebook" title="Visit SET on Facebook">f</a></div></div><div className="footer-links"><div><span>Explore</span><a href="#about">About SET</a><a href="#work">What we do</a><a href="#projects">Projects</a><a href="#people">People</a></div><div><span>Connect</span><a href="#programmes">Programmes</a><a href="#faq">FAQ</a><a href="#contact">Contact and partner with us</a></div></div><div className="footer-bottom"><span>© 2026 Sierra Electric Technologies SL</span><span>Freetown, Sierra Leone <span className="footer-dot" /> Built for Africa</span></div></footer>
-  </main>
+export default function HomePage() {
+  return (
+    <>
+      <Navbar />
+      <main>
+        <Hero />
+        <IndexPick />
+        <Services />
+        <Featured />
+        <Impact />
+        <HomeCta />
+      </main>
+      <Footer />
+    </>
+  )
 }
