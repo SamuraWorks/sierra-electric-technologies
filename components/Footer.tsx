@@ -87,6 +87,10 @@ export function Footer() {
         <span>© 2026 Sierra Electric Technologies SL</span>
         <span>
           Freetown, Sierra Leone <span className="footer-dot" aria-hidden="true" /> Built for Africa
+          <span className="footer-dot" aria-hidden="true" />
+          <a href="/auth/login" className="footer-staff">
+            Staff portal
+          </a>
         </span>
       </div>
     </footer>
