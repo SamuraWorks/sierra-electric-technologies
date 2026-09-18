@@ -100,6 +100,68 @@ export interface LeaveRequest {
   updated_at: string
 }
 
+export interface AttendanceRecord {
+  id: string
+  user_id: string
+  date: string
+  clock_in: string | null
+  clock_out: string | null
+  note: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Candidate {
+  id: string
+  display_name: string
+  email: string
+  phone: string | null
+  position_applied: string | null
+  source: string
+  status: 'new' | 'shortlisted' | 'interviewed' | 'offered' | 'hired' | 'rejected'
+  last_contacted_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface CandidateNote {
+  id: string
+  candidate_id: string
+  user_id: string
+  note: string
+  created_at: string
+}
+
+export interface SalaryConfig {
+  user_id: string
+  gross_salary: number
+  currency: string
+  bank_name: string | null
+  bank_account: string | null
+  updated_at: string
+}
+
+export interface PayrollRun {
+  id: string
+  month: string
+  label: string
+  status: 'draft' | 'processed' | 'paid'
+  created_by: string | null
+  processed_at: string
+  created_at: string
+}
+
+export interface PayrollEntry {
+  id: string
+  run_id: string
+  user_id: string
+  gross_salary: number
+  deductions: number
+  net_salary: number
+  currency: string
+  created_at: string
+}
+
 // --- Composite types (for joined queries) ---
 export interface UserProfile extends Profile {
   user_roles?: UserRole[]

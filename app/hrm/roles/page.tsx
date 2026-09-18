@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getAuthContext, hasPermission } from '@/lib/hrm/auth'
 import { ROLE_PERMISSIONS } from '@/lib/hrm/permissions'
+import { RoleAssignment } from '@/components/hrm/role-assignment'
 
 export const metadata = { title: 'Roles & Assignments' }
 
@@ -29,6 +30,8 @@ export default async function RolesPage() {
     []) as { id: string; user_id: string; role_id: string; is_active: boolean; granted_at: string; roles: { name: string; slug: string }[] }[]
   const profiles = profilesRes.data ?? []
 
+  const roleOptions = roles.map((r) => ({ id: String(r.id), name: String(r.name), slug: String(r.slug) }))
+
   const userRows = profiles
     .map((p) => {
       const assigned = assignments.filter((a) => a.user_id === p.id)
@@ -38,6 +41,9 @@ export default async function RolesPage() {
       }
     })
     .sort((a, b) => (a.employee_id ?? '').localeCompare(b.employee_id ?? ''))
+
+  const canAssign = hasPermission(ctx, 'roles.assign')
+  const canRemove = hasPermission(ctx, 'roles.remove')
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-8">
@@ -113,20 +119,13 @@ export default async function RolesPage() {
                   </span>
                 </div>
                 <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                  {u.roles.length > 0 ? (
-                    u.roles.map((r) => (
-                      <span
-                        key={r.id}
-                        className="rounded-full border border-[rgba(47,154,91,0.35)] bg-[rgba(47,154,91,0.08)] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]"
-                      >
-                        {r.name}
-                      </span>
-                    ))
-                  ) : (
-                    <span className="rounded-full border border-[#e0a03b] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-[#9c6b1f]">
-                      No role — assign one
-                    </span>
-                  )}
+                  <RoleAssignment
+                    userId={u.id}
+                    assignedRoles={u.roles.map((r) => ({ id: r.id, name: r.name, slug: r.slug }))}
+                    allRoles={roleOptions}
+                    canAssign={canAssign}
+                    canRemove={canRemove}
+                  />
                   <span className="ml-auto font-mono text-[9px] tracking-[0.08em] text-[var(--muted)]">
                     {u.email ?? ''}
                   </span>
