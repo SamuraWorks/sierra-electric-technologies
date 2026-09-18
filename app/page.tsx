@@ -58,6 +58,7 @@ const indexPages = [
 function Hero() {
   return (
     <section className="hero container" id="top">
+      <div className="hero-wash" aria-hidden="true" />
       <div className="hero-copy">
         <span className="eyebrow">
           <span className="eyebrow-dot" aria-hidden="true" /> Youth-led climate technology
