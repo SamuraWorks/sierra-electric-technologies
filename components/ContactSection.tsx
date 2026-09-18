@@ -35,7 +35,6 @@ export function ContactSection() {
           <Reveal>
             <div className="contact-intro">
               <p className="section-head__meta">
-                <span className="cell-idx">01</span>
                 <span className="kicker">Contact Sierra Electric Technologies</span>
               </p>
               <h2>

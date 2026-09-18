@@ -17,7 +17,6 @@ function People() {
   return (
     <section className="section container" id="people">
       <SectionHeading
-        index="01"
         kicker="People"
         title={
           <>
@@ -82,7 +81,6 @@ function MediaJournal() {
     <section className="section section-alt" id="media">
       <div className="container">
         <SectionHeading
-          index="03"
           kicker="Stories from the field"
           title={
             <>
@@ -126,7 +124,6 @@ function WorkWithUs() {
     <section className="section" id="work">
       <div className="container">
         <SectionHeading
-          index="04"
           kicker="Work with SET"
           title={
             <>
@@ -192,7 +189,6 @@ function JoinSteps() {
     <section className="section section-alt" id="join">
       <div className="container">
         <SectionHeading
-          index="05"
           kicker="How to join"
           title={
             <>

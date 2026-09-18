@@ -60,7 +60,6 @@ function Opportunity() {
   return (
     <section className="section container" id="opportunity">
       <SectionHeading
-        index="01"
         kicker="Why SET"
         title={
           <>
@@ -119,7 +118,6 @@ function TrackRecord() {
     <section className="section section-alt" id="impact">
       <div className="container">
         <SectionHeading
-          index="02"
           kicker="Track record"
           title={
             <>
@@ -147,7 +145,6 @@ function Roadmap() {
     <section className="section" id="roadmap">
       <div className="container">
         <SectionHeading
-          index="03"
           kicker="Future roadmap"
           title={
             <>
@@ -185,7 +182,6 @@ function Partnerships() {
     <section className="section section-alt" id="partnerships">
       <div className="container">
         <SectionHeading
-          index="04"
           kicker="Partnerships & funding"
           title={
             <>

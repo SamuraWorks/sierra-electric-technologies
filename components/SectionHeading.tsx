@@ -1,7 +1,6 @@
 import { Reveal } from './Reveal'
 
 type SectionHeadingProps = {
-  index?: string
   kicker: string
   title: React.ReactNode
   description?: string
@@ -9,21 +8,13 @@ type SectionHeadingProps = {
   align?: 'left' | 'center'
 }
 
-export function SectionHeading({
-  index,
-  kicker,
-  title,
-  description,
-  children,
-  align = 'left',
-}: SectionHeadingProps) {
+export function SectionHeading({ kicker, title, description, children, align = 'left' }: SectionHeadingProps) {
   return (
     <Reveal>
       <div className={`section-head section-head-${align}`}>
         <div className="section-head__main">
-          {(index || kicker) && (
+          {kicker && (
             <p className="section-head__meta">
-              {index && <span className="cell-idx">{index}</span>}
               <span className="kicker">{kicker}</span>
             </p>
           )}

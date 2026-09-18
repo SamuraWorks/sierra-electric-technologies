@@ -24,7 +24,6 @@ function Featured() {
   return (
     <section className="section container" id="featured-case">
       <SectionHeading
-        index="01"
         kicker="Flagship build"
         title={
           <>
@@ -72,7 +71,6 @@ function Portfolio() {
     <section className="section section-alt" id="portfolio">
       <div className="container">
         <SectionHeading
-          index="02"
           kicker="The full portfolio"
           title={
             <>
@@ -120,7 +118,6 @@ function RD() {
     <section className="section" id="innovation">
       <div className="container">
         <SectionHeading
-          index="03"
           kicker="Research, development & skills"
           title={
             <>

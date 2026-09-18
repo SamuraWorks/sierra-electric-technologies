@@ -10,10 +10,26 @@ export const metadata = {
     'Partner, invest, support, research or join Sierra Electric Technologies. Reach the SET team directly with a message.',
 }
 
+export const dynamic = 'force-static'
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((faq) => ({
+    '@type': 'Question',
+    name: faq.question,
+    acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+  })),
+}
+
 export default function ContactPage() {
   return (
     <>
       <Navbar />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <main id="main" tabIndex={-1}>
         <section className="detail-hero container">
           <p className="detail-category">Contact Sierra Electric Technologies</p>
@@ -31,7 +47,6 @@ export default function ContactPage() {
         <section className="section" id="faq">
           <div className="container">
             <SectionHeading
-              index="02"
               kicker="Frequently asked questions"
               title={
                 <>

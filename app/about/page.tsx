@@ -20,7 +20,6 @@ function Story() {
         <div className="about-intro">
           <Reveal>
             <p className="section-head__meta">
-              <span className="cell-idx">01</span>
               <span className="kicker">Who we are</span>
             </p>
             <h2>
@@ -100,7 +99,6 @@ function DirectorySection() {
     <section className="section section-alt" id="directory">
       <div className="container">
         <SectionHeading
-          index="02"
           kicker="Everything a partner needs"
           title={
             <>

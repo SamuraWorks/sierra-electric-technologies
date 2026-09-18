@@ -24,37 +24,31 @@ const serviceIcons: Record<string, typeof Zap> = {
 
 const indexPages = [
   {
-    number: '01',
     title: 'About',
     blurb: 'Who we are, our story, key facts and a transparent institutional profile.',
     href: '/about',
   },
   {
-    number: '02',
     title: 'Our Approach',
     blurb: 'Electric mobility, clean energy, smart agriculture, climate innovation and how we work.',
     href: '/approach',
   },
   {
-    number: '03',
     title: 'The Team',
     blurb: 'The people behind the builds — and the pathways to join them.',
     href: '/team',
   },
   {
-    number: '04',
     title: 'Research',
     blurb: 'Builds, pilots and concept records, plus R&D and training programmes.',
     href: '/research',
   },
   {
-    number: '05',
     title: 'For Investors',
     blurb: 'Track record, growth directions, roadmap and partnership opportunities.',
     href: '/investors',
   },
   {
-    number: '06',
     title: 'Contact',
     blurb: 'Partnerships, support, research and a direct message to the team.',
     href: '/contact',
@@ -138,7 +132,6 @@ function IndexPick() {
     <section className="section-tight container" id="sections">
       <Reveal>
         <p className="section-head__meta">
-          <span className="cell-idx">Index</span>
           <span className="kicker">Everything on the site</span>
         </p>
       </Reveal>
@@ -147,7 +140,6 @@ function IndexPick() {
           <Reveal key={page.title} delay={i * 60} className="grid-reveal">
             <a className="index-card" href={page.href}>
               <span className="index-card__top">
-                <span className="cell-idx">{page.number}</span>
                 <ArrowRight size={16} aria-hidden="true" />
               </span>
               <h3>{page.title}</h3>
@@ -165,7 +157,6 @@ function Services() {
     <section className="section section-alt" id="services">
       <div className="container">
         <SectionHeading
-          index="02"
           kicker="What SET does"
           title={
             <>
@@ -208,7 +199,6 @@ function Featured() {
     <section className="section" id="projects">
       <div className="container">
         <SectionHeading
-          index="03"
           kicker="Flagship build"
           title={
             <>
@@ -291,7 +281,6 @@ function Impact() {
     <section className="section section-alt" id="impact">
       <div className="container">
         <SectionHeading
-          index="04"
           kicker="Impact and recognition"
           title={
             <>

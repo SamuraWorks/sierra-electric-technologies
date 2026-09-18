@@ -23,7 +23,6 @@ function ServiceCards() {
   return (
     <section className="section container" id="capabilities">
       <SectionHeading
-        index="01"
         kicker="What SET does"
         title={
           <>
@@ -65,7 +64,6 @@ function SectorGrid() {
             <Reveal>
               <div className="sector-story">
                 <p className="section-head__meta">
-                  <span className="cell-idx">02</span>
                   <span className="kicker">Electric mobility</span>
                 </p>
                 <h2>
@@ -107,7 +105,6 @@ function SectorGrid() {
             <Reveal>
               <div className="sector-story">
                 <p className="section-head__meta">
-                  <span className="cell-idx">03</span>
                   <span className="kicker">Clean energy</span>
                 </p>
                 <h2>
@@ -151,7 +148,6 @@ function Process() {
     <section className="section section-alt" id="process">
       <div className="container">
         <SectionHeading
-          index="04"
           kicker="How we work"
           title={
             <>
