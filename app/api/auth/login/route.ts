@@ -26,9 +26,9 @@ export async function POST(request: NextRequest) {
 
   const MAX_ATTEMPTS = 3
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    const supabase = await createClient()
-    let result: Awaited<ReturnType<typeof supabase.auth.signInWithPassword>>
+    let result: { error: { message: string } | null }
     try {
+      const supabase = await createClient()
       result = await supabase.auth.signInWithPassword({ email, password })
     } catch (e) {
       const message = e instanceof Error ? e.message : 'unknown error'
@@ -36,9 +36,15 @@ export async function POST(request: NextRequest) {
         await sleep(800 * (attempt + 1))
         continue
       }
+      if (isNetworkError(message)) {
+        return NextResponse.json(
+          { error: 'Network error. Please check your connection and try again.' },
+          { status: 502 },
+        )
+      }
       return NextResponse.json(
-        { error: 'Network error. Please check your connection and try again.' },
-        { status: 502 },
+        { error: 'Sign-in service is not configured correctly. Please contact your administrator.' },
+        { status: 500 },
       )
     }
 
