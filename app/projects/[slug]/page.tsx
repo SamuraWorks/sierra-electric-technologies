@@ -155,7 +155,7 @@ export default async function ProjectPage({
   return (
     <>
       <Navbar />
-      <main>
+      <main id="main" tabIndex={-1}>
         <section className="detail-hero container">
           <Link className="btn btn-text" href="/research">
             <ArrowLeft size={15} aria-hidden="true" /> Back to research

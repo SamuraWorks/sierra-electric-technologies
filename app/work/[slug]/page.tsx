@@ -85,7 +85,7 @@ export default async function WorkPage({
   return (
     <>
       <Navbar />
-      <main>
+      <main id="main" tabIndex={-1}>
         <section className="detail-hero container">
           <Link className="btn btn-text" href="/approach">
             <ArrowLeft size={15} aria-hidden="true" /> Back to what we do

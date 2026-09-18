@@ -246,7 +246,7 @@ export default function InvestorsPage() {
   return (
     <>
       <Navbar />
-      <main>
+      <main id="main" tabIndex={-1}>
         <section className="detail-hero container">
           <p className="detail-category">For investors and partners</p>
           <h1>

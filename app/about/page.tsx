@@ -148,7 +148,7 @@ export default function AboutPage() {
   return (
     <>
       <Navbar />
-      <main>
+      <main id="main" tabIndex={-1}>
         <section className="detail-hero container">
           <p className="detail-category">About Sierra Electric Technologies</p>
           <h1>

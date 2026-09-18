@@ -239,7 +239,7 @@ export default function TeamPage() {
   return (
     <>
       <Navbar />
-      <main>
+      <main id="main" tabIndex={-1}>
         <section className="detail-hero container">
           <p className="detail-category">The team and people</p>
           <h1>

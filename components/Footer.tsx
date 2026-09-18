@@ -1,4 +1,4 @@
-import { Mail, MapPin, Phone } from 'lucide-react'
+import { ExternalLink, Mail, MapPin, Phone } from 'lucide-react'
 import { ADDRESS, EMAIL, FACEBOOK_URL, MAPS_URL, PHONE } from '@/lib/site'
 import { Logo } from './Logo'
 
@@ -42,20 +42,22 @@ export function Footer() {
               href={MAPS_URL}
               target="_blank"
               rel="noreferrer"
-              aria-label="Open SET location in Google Maps"
-              title="Open location in Google Maps"
+              aria-label="Open SET location in Google Maps (opens in a new tab)"
+              title="Open location in Google Maps (opens in a new tab)"
             >
-              <MapPin size={19} />
+              <MapPin size={19} aria-hidden="true" />
+              <ExternalLink size={8} className="contact-icon__ext" aria-hidden="true" />
             </a>
             <a
               className="contact-icon contact-facebook"
               href={FACEBOOK_URL}
               target="_blank"
               rel="noreferrer"
-              aria-label="Visit Sierra Electric Technologies on Facebook"
-              title="Visit SET on Facebook"
+              aria-label="Visit Sierra Electric Technologies on Facebook (opens in a new tab)"
+              title="Visit SET on Facebook (opens in a new tab)"
             >
               f
+              <ExternalLink size={8} className="contact-icon__ext" aria-hidden="true" />
             </a>
           </div>
         </div>

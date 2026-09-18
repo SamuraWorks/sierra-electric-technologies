@@ -213,7 +213,7 @@ export default function ResearchPage() {
   return (
     <>
       <Navbar />
-      <main>
+      <main id="main" tabIndex={-1}>
         <section className="detail-hero container">
           <p className="detail-category">Research, builds and programmes</p>
           <h1>

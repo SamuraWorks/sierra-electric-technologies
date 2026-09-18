@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowRight, MapPin } from 'lucide-react'
+import { ArrowRight, ExternalLink, MapPin } from 'lucide-react'
 import { Reveal } from './Reveal'
 import { ADDRESS, FACEBOOK_URL, MAPS_URL } from '@/lib/site'
 
@@ -47,24 +47,18 @@ export function ContactSection() {
                 team will hear from you.
               </p>
               <div className="contact-direct">
-                <a
-                  href={MAPS_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Open SET location in Google Maps"
-                >
+                <a href={MAPS_URL} target="_blank" rel="noreferrer">
                   <MapPin size={17} aria-hidden="true" /> {ADDRESS}
+                  <ExternalLink size={13} aria-hidden="true" />
+                  <span className="sr-only"> (opens in a new tab)</span>
                 </a>
-                <a
-                  href={FACEBOOK_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Visit SET on Facebook"
-                >
+                <a href={FACEBOOK_URL} target="_blank" rel="noreferrer">
                   <span className="cap" aria-hidden="true">
                     Follow
                   </span>
                   Facebook — @sierraelectricsl
+                  <ExternalLink size={13} aria-hidden="true" />
+                  <span className="sr-only"> (opens in a new tab)</span>
                 </a>
               </div>
             </div>

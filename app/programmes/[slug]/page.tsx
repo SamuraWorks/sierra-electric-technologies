@@ -85,7 +85,7 @@ export default async function ProgrammePage({
   return (
     <>
       <Navbar />
-      <main>
+      <main id="main" tabIndex={-1}>
         <section className="detail-hero container">
           <Link className="btn btn-text" href="/research#programmes">
             <ArrowLeft size={15} aria-hidden="true" /> Back to programmes

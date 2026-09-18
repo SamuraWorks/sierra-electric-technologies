@@ -199,7 +199,7 @@ export default function ApproachPage() {
   return (
     <>
       <Navbar />
-      <main>
+      <main id="main" tabIndex={-1}>
         <section className="detail-hero container">
           <p className="detail-category">How SET works</p>
           <h1>

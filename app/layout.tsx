@@ -37,6 +37,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body className={`${sans.variable} ${display.variable} antialiased`}>
+        <a className="skip" href="#main">
+          Skip to main content
+        </a>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

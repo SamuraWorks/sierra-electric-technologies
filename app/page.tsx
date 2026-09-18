@@ -348,7 +348,7 @@ export default function HomePage() {
   return (
     <>
       <Navbar />
-      <main>
+      <main id="main" tabIndex={-1}>
         <Hero />
         <IndexPick />
         <Services />
