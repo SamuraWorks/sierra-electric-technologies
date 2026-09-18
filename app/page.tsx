@@ -97,7 +97,7 @@ function Hero() {
       <div className="hero-visual">
         <figure className="hero-photo">
           <img
-            src={images.shuttle}
+            src={images.shuttleHero}
             alt="A SET electric shuttle built in Sierra Leone"
             width={640}
             height={460}

@@ -105,7 +105,12 @@ function MediaJournal() {
           {rest.map((card, i) => (
             <Reveal key={card.kicker} delay={(i % 2) * 70} className="grid-reveal">
               <article className="journal-card">
-                <img src={card.image} alt={card.alt} loading="lazy" />
+                <img
+                  src={card.image}
+                  alt={card.alt}
+                  loading="lazy"
+                  className={card.fit ? 'fit' : undefined}
+                />
                 <div className="journal-card__body">
                   <span className="kicker">{card.kicker}</span>
                   <p>{card.description}</p>

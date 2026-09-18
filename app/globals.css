@@ -1744,6 +1744,11 @@ ul, ol { margin: 0; padding: 0; }
   filter: saturate(0.96);
 }
 
+.journal-card img.fit {
+  object-fit: contain;
+  background: var(--bg-2);
+}
+
 .journal-card--large { grid-row: span 2; }
 .journal-card--large img { height: 100%; min-height: 448px; }
 

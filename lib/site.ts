@@ -10,6 +10,7 @@ const CDN = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/'
 export const images = {
   logo: `${CDN}1776285047875-mvtv8fMkk7osjEWCypeWq12mH6xUoD.jpg`,
   shuttle: '/images/electric-shuttle.jpg',
+  shuttleHero: `${CDN}10%20Passenger%20E%20car%20for%20Africell%20Made%20by%20Sierra%20Electric.jfif-ZaMipho7TuDliZqhJp2H8U3QOYEpNi.jpeg`,
   keke: '/images/electric-keke.jpg',
   handWashingMachine: '/images/hand-washing-machine.jpg',
   solarBackpack: '/images/solar-backpack.jpg',
@@ -98,6 +99,7 @@ export type MediaCard = {
   image: string
   alt: string
   large?: boolean
+  fit?: boolean
 }
 
 export const media: MediaCard[] = [
@@ -106,7 +108,7 @@ export const media: MediaCard[] = [
   { kicker: 'Training in the room', image: images.trainingRoom, alt: 'SET team members and trainees working together in a training room', description: 'Practical learning, technical confidence and collaboration.' },
   { kicker: 'Workshop at Freetown Innovation Lab', image: images.workshopTeam, alt: 'SET team working around electric vehicle components in the workshop', description: 'Engineering teams examine batteries, wiring and mobility systems.' },
   { kicker: 'On television and in public', image: images.panel, alt: 'SET team members speaking on a public panel', description: 'SET’s climate and technology work reaches wider conversations.' },
-  { kicker: 'Recognition and milestones', image: images.ceoWithMinister, alt: 'SET founder and CEO meeting a Minister', description: 'Team achievements that document SET’s growing ecosystem.' },
+  { kicker: 'Recognition and milestones', image: images.ceoWithMinister, alt: 'SET founder and CEO meeting a Minister', description: 'Team achievements that document SET’s growing ecosystem.', fit: true },
   { kicker: 'Representing SET at Youth Day', image: images.founderAndCo, alt: 'James and the co-founder representing Sierra Electric Technologies at a Youth Day programme', description: 'James Samba and the co-founder representing the team at a Youth Day programme.' },
 ]
 
@@ -137,7 +139,7 @@ export const people: Member[] = [
   { featured: true, name: 'James Samba', role: 'Founder & CEO', image: images.engineer, alt: 'James Samba, founder of Sierra Electric Technologies, in engineering safety gear', bio: 'Founder, technology builder and 2025 MOCTI Young Innovator of the Year. His journey from experimenting with discarded electronics to electric mobility anchors SET’s culture of curiosity and practical engineering.' },
   { name: 'Ms. Mariama Salmana Bah', role: 'Co-Founder & Co-CEO', bio: 'Founder and Co-Chief Executive Officer, responsible for business development, growth, partnerships and strategic leadership across Sierra Electric Technologies Ltd. and its subsidiary venture, Speed Networks Ltd.' },
   { name: 'Samuel Samura', role: 'Administrative Officer & Software Engineer', image: images.youngBuilder, alt: 'Samuel Samura, Administrative Officer and Software Engineer at Sierra Electric Technologies', bio: 'A relentless Sierra Leonean builder and problem-solver working across engineering, technology, startups and leadership. Samuel helps turn ambitious ideas into practical systems while studying at Fourah Bay College.' },
-  { name: 'Builders in the workshop', role: 'Engineering team', image: images.shuttle, alt: 'SET engineering team workspace and electric vehicle', bio: 'Information required: confirm chief engineer, engineers, operations team, programme team, advisors and mentors.' },
+  { name: 'Builders in the workshop', role: 'Engineering team', bio: 'Information required: confirm chief engineer, engineers, operations team, programme team, advisors and mentors.' },
   { name: 'Leadership profile', role: 'Chief Engineer & Architect', bio: 'Information required: confirm this person’s name, biography, engineering responsibilities and architectural/design role.' },
   { name: 'People behind the work', role: 'The SET team', bio: 'Information required: upload a team photo and confirm the names, roles and programme responsibilities of the wider team.' },
 ]
