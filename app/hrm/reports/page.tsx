@@ -83,7 +83,7 @@ export default async function ReportsPage() {
   const csv = csvRows.map((r) => r.join(',')).join('\n')
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-8">
+    <div className="px-4 py-6 sm:px-6 sm:py-8">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="mb-2 text-[10.5px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
@@ -159,7 +159,7 @@ export default async function ReportsPage() {
                 <div key={date} className="flex flex-1 flex-col items-center gap-1.5">
                   <span className="text-[10px] font-mono text-[var(--muted)]">{pct}%</span>
                   <div
-                    className="w-full rounded-t-md bg-[rgba(47,154,91,0.7)] transition-all"
+                    className="w-full rounded-t-md bg-[rgba(37,99,235,0.7)] transition-all"
                     style={{ height: `${Math.max(4, pct)}%` }}
                     title={`${date}: ${present}/${staffCount} present`}
                   />

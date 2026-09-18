@@ -14,7 +14,7 @@ export default async function NewEmployeePage() {
   const { data: roles } = await supabase.from('roles').select('slug, name').order('hierarchy_level', { ascending: true })
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-8">
+    <div className="px-4 py-6 sm:px-6 sm:py-8">
       <p className="mb-2 text-[10.5px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
         Sierra Electric Technologies — HR
       </p>

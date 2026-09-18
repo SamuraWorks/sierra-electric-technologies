@@ -17,6 +17,17 @@ export const images = {
   lamp: '/images/device-to-lamp.jpg',
   ceoWithMinister: '/images/ceo-with-minister.jpg',
   founderAndCo: '/images/founder-and-co.jpg',
+  chiefEngineer: '/images/chief-engineer.jpg',
+  coFounder: '/images/co-founder.jpg',
+  electricFarmVehicleUndp: '/images/electric-farm-vehicle-undp.jpg',
+  electricMiniBus: '/images/electric-mini-bus.jpg',
+  greenshiftLunch: '/images/greenshift-lunch.jpg',
+  greenshiftGroup2025: '/images/greenshift.jpg',
+  moneypoint: '/images/moneypoint.jpg',
+  youthConnektAfrica: '/images/youth-connekt-africa.jpg',
+  teamWithMayor: '/images/team-with-mayor-freetown.jpg',
+  tvInterview: '/images/tv-interview.jpg',
+  farmVehiclePrototype: '/images/farm-vehicle-prototype-unipod.jpg',
   workshop: `${CDN}IMG-20260811-WA0016-Yig3FYAvJI3CxTFC47olxk8ZZVTkaZ.jpg`,
   engineer: `${CDN}1786993801626-l1z3FnX2M1ZM9KAvn4rafgclZAFQ7g.jpg`,
   blackVehicle: `${CDN}0f360a7e-ec58-4bb6-9d73-f39bc5d453df%20%281%29.jfif-xN5PgLAjYsfbRMkXdFvidbMRQpcTDR.jpeg`,
@@ -75,10 +86,10 @@ export const projects: Project[] = [
   { title: 'Device-to-Lamp', tag: 'Circular economy', image: images.lamp, imageAlt: 'A device repurposed into a practical study lamp by Sierra Electric Technologies', description: 'Repurposing old electronic devices into practical study lamps while reducing e-waste.' },
   { title: 'GreenShift Systems', tag: 'Flagship blueprint', description: 'An integrated model connecting solar charging, electric mobility and climate-smart agriculture.' },
   { title: 'Smart Farm', tag: 'Demonstration site', description: 'A living site for solar-powered irrigation, weather monitoring, composting and crop-health research.' },
-  { title: 'Electric Mini Bus', tag: 'Development direction / mobility', description: 'A larger electric public-transport direction building on SET’s shuttle and vehicle engineering work.' },
+  { title: 'Electric Mini Bus', tag: 'Development direction / mobility', image: images.electricMiniBus, imageAlt: 'An electric mini bus built by Sierra Electric Technologies', description: 'A larger electric public-transport direction building on SET’s shuttle and vehicle engineering work.' },
   { title: 'Automated Hand-Washing Machine', tag: 'Prototype / public health', image: images.handWashingMachine, imageAlt: 'An automated solar-powered hand-washing machine prototype', description: 'An automated hand-washing concept designed to make hygiene safer, more consistent and easier to access.' },
   { title: 'Sierra Circular Energy Initiative', tag: 'Circular energy / youth employment', description: 'A youth-led circular model repurposing mobile e-waste and solar batteries into affordable solar backpacks, lighting kits and portable charging units for underserved communities.' },
-  { title: 'Electric Farm Vehicle SEFT-V', tag: 'Validated design / smart agriculture', description: 'A locally manufacturable four-wheel solar-assisted electric farm vehicle designed for approximately 500 kg of produce, tools and farm transport across rural terrain.' },
+  { title: 'Electric Farm Vehicle SEFT-V', tag: 'Validated design / smart agriculture', image: images.electricFarmVehicleUndp, imageAlt: 'The electric farm vehicle SEFT-V with UNDP present', description: 'A locally manufacturable four-wheel solar-assisted electric farm vehicle designed for approximately 500 kg of produce, tools and farm transport across rural terrain.' },
 ]
 
 export function projectHref(title: string) {
@@ -102,14 +113,25 @@ export type MediaCard = {
   fit?: boolean
 }
 
+export const greenshiftGallery: MediaCard[] = [
+  { kicker: 'GreenShift', image: images.greenshiftGroup, alt: 'GreenShift participants celebrating together in 2025', description: 'Youth climate innovators gathering, learning and building community.', fit: true },
+  { kicker: 'GreenShift', image: images.greenshiftGroup2025, alt: 'GreenShift participants with Sierra Electric Technologies', description: 'GreenShift youth climate innovators with the SET team.', fit: true },
+  { kicker: 'GreenShift working lunch', image: images.greenshiftLunch, alt: 'GreenShift participants sharing a working lunch', description: 'GreenShift participants sharing ideas and a working lunch.', fit: true },
+]
+
 export const media: MediaCard[] = [
   { large: true, kicker: 'A visit from Pontus Edenberg', image: images.specialGuest, alt: 'A special guest visits the Sierra Electric Technologies workshop and meets the team', description: 'Pontus Edenberg, CEO of Swedish technology company Twingly, visited SET’s workshop to meet the team and see locally built electric-mobility work up close. Twingly provides API-based media intelligence data across news, blogs, forums and reviews; his visit reflects the value of connecting Sierra Leonean builders with international technology leaders.' },
-  { kicker: 'GreenShift', image: images.greenshiftGroup, alt: 'GreenShift participants celebrating together in 2025', description: 'Youth climate innovators gathering, learning and building community.' },
   { kicker: 'Training in the room', image: images.trainingRoom, alt: 'SET team members and trainees working together in a training room', description: 'Practical learning, technical confidence and collaboration.' },
   { kicker: 'Workshop at Freetown Innovation Lab', image: images.workshopTeam, alt: 'SET team working around electric vehicle components in the workshop', description: 'Engineering teams examine batteries, wiring and mobility systems.' },
   { kicker: 'On television and in public', image: images.panel, alt: 'SET team members speaking on a public panel', description: 'SET’s climate and technology work reaches wider conversations.' },
   { kicker: 'Recognition and milestones', image: images.ceoWithMinister, alt: 'SET founder and CEO meeting a Minister', description: 'Team achievements that document SET’s growing ecosystem.', fit: true },
   { kicker: 'Representing SET at Youth Day', image: images.founderAndCo, alt: 'James and the co-founder representing Sierra Electric Technologies at a Youth Day programme', description: 'James Samba and the co-founder representing the team at a Youth Day programme.' },
+  { kicker: 'Speaking at Youth Connekt Africa', image: images.youthConnektAfrica, alt: 'James Samba speaking to over 20,000 young people from across Africa at Youth Connekt Africa in 2023', description: 'James Samba taking the stage at Youth Connekt Africa in 2023, speaking to over 20,000 young people from across Africa about youth-led climate technology.' },
+  { kicker: 'With the Mayor of Freetown', image: images.teamWithMayor, alt: 'The SET team meeting with the Mayor of Freetown', description: 'The SET team meeting with the Mayor of Freetown to connect local mobility work with the city’s transport ambitions.', fit: true },
+  { kicker: 'On television', image: images.tvInterview, alt: 'A SET team member being interviewed on television', description: 'SET’s electric-mobility work reaches national television audiences.' },
+  { kicker: 'SEFT-V prototype work', image: images.farmVehiclePrototype, alt: 'Working on the electric farm vehicle prototype at UniPod with UNDP', description: 'Building the Electric Farm Vehicle SEFT-V prototype at UniPod with UNDP support.', fit: true },
+  { kicker: 'Electric Mini Bus', image: images.electricMiniBus, alt: 'An electric mini bus built by Sierra Electric Technologies', description: 'A larger public-transport direction building on SET’s shuttle and vehicle engineering work.' },
+  { kicker: 'At Moneypoint', image: images.moneypoint, alt: 'The SET electric mobility work at Moneypoint', description: 'SET’s electric vehicles on the move in Freetown.', fit: true },
 ]
 
 export type Programme = {
@@ -137,10 +159,10 @@ export type Member = {
 
 export const people: Member[] = [
   { featured: true, name: 'James Samba', role: 'Founder & CEO', image: images.engineer, alt: 'James Samba, founder of Sierra Electric Technologies, in engineering safety gear', bio: 'Founder, technology builder and 2025 MOCTI Young Innovator of the Year. His journey from experimenting with discarded electronics to electric mobility anchors SET’s culture of curiosity and practical engineering.' },
-  { name: 'Ms. Mariama Salmana Bah', role: 'Co-Founder & Co-CEO', bio: 'Founder and Co-Chief Executive Officer, responsible for business development, growth, partnerships and strategic leadership across Sierra Electric Technologies Ltd. and its subsidiary venture, Speed Networks Ltd.' },
+  { name: 'Ms. Mariama Salmana Bah', role: 'Co-Founder & Co-CEO', image: images.coFounder, alt: 'Ms. Mariama Salmana Bah, Co-Founder & Co-CEO of Sierra Electric Technologies', bio: 'Founder and Co-Chief Executive Officer, responsible for business development, growth, partnerships and strategic leadership across Sierra Electric Technologies Ltd. and its subsidiary venture, Speed Networks Ltd.' },
   { name: 'Samuel Samura', role: 'Administrative Officer & Software Engineer', image: images.youngBuilder, alt: 'Samuel Samura, Administrative Officer and Software Engineer at Sierra Electric Technologies', bio: 'A relentless Sierra Leonean builder and problem-solver working across engineering, technology, startups and leadership. Samuel helps turn ambitious ideas into practical systems while studying at Fourah Bay College.' },
   { name: 'Builders in the workshop', role: 'Engineering team', bio: 'Information required: confirm chief engineer, engineers, operations team, programme team, advisors and mentors.' },
-  { name: 'Leadership profile', role: 'Chief Engineer & Architect', bio: 'Information required: confirm this person’s name, biography, engineering responsibilities and architectural/design role.' },
+  { name: 'Chief Engineer', role: 'Chief Engineer & Architect', image: images.chiefEngineer, alt: 'The Chief Engineer at Sierra Electric Technologies', bio: 'Information required: confirm this person’s name, biography, engineering responsibilities and architectural/design role.' },
   { name: 'People behind the work', role: 'The SET team', bio: 'Information required: upload a team photo and confirm the names, roles and programme responsibilities of the wider team.' },
 ]
 

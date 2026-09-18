@@ -5,6 +5,7 @@ import {
   CalendarCheck,
   Plane,
   Wallet,
+  Banknote,
   Receipt,
   GraduationCap,
   Star,
@@ -14,6 +15,14 @@ import {
   ShieldCheck,
   ScrollText,
   Settings,
+  Handshake,
+  Building2,
+  Briefcase,
+  FolderKanban,
+  ListTodo,
+  ClipboardList,
+  UserCog,
+  UserCircle,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -31,17 +40,27 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: 'People',
     items: [
-      { label: 'Employees', href: '/hrm/employees', permission: 'employees.view' },
-      { label: 'Candidates', href: '/hrm/candidates', permission: 'candidates.view' },
-      { label: 'Attendance', href: '/hrm/attendance', permission: 'attendance.view' },
-      { label: 'Leave', href: '/hrm/leave', permission: 'leave.view' },
+      { label: 'Staff', href: '/hrm/employees', permission: 'employees.view' },
+      { label: 'Departments', href: '/hrm/departments', permission: 'departments.view' },
+      { label: 'Positions', href: '/hrm/positions', permission: 'positions.view' },
     ],
   },
   {
-    title: 'Finance',
+    title: 'Work',
     items: [
-      { label: 'Payroll', href: '/hrm/payroll', permission: 'payroll.view' },
-      { label: 'Expenses', href: '/hrm/finance', permission: 'finance.view' },
+      { label: 'Projects', href: '/hrm/projects', permission: 'projects.view' },
+      { label: 'Tasks', href: '/hrm/tasks', permission: 'tasks.view' },
+      { label: 'Work Reports', href: '/hrm/work-reports', permission: 'work_reports.view' },
+    ],
+  },
+  {
+    title: 'Company',
+    items: [
+      { label: 'Attendance', href: '/hrm/attendance', permission: 'attendance.view' },
+      { label: 'Leave', href: '/hrm/leave', permission: 'leave.view' },
+      { label: 'Payments', href: '/hrm/payments', permission: 'payments.view' },
+      { label: 'Expenses', href: '/hrm/expenses', permission: 'finance.view' },
+      { label: 'Documents', href: '/hrm/documents', permission: 'documents.view' },
     ],
   },
   {
@@ -49,21 +68,28 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: 'Training', href: '/hrm/training', permission: 'training.view' },
       { label: 'Performance', href: '/hrm/performance', permission: 'performance.view' },
-      { label: 'Documents', href: '/hrm/documents', permission: 'documents.view' },
     ],
   },
   {
     title: 'Insights',
     items: [
       { label: 'Reports', href: '/hrm/reports', permission: 'reports.view' },
+      { label: 'Partner Gigs', href: '/hrm/partners', permission: 'partners.view' },
     ],
   },
   {
-    title: 'System',
+    title: 'Administration',
     items: [
-      { label: 'Roles', href: '/hrm/roles', permission: 'roles.view' },
+      { label: 'Users', href: '/hrm/users', permission: 'users.manage' },
+      { label: 'Roles & Permissions', href: '/hrm/roles', permission: 'roles.view' },
       { label: 'Audit Log', href: '/hrm/audit', permission: 'audit.view' },
       { label: 'Settings', href: '/hrm/settings', permission: 'settings.manage' },
+    ],
+  },
+  {
+    title: 'Account',
+    items: [
+      { label: 'My Profile', href: '/hrm/profile' },
     ],
   },
 ]
@@ -71,19 +97,31 @@ export const NAV_GROUPS: NavGroup[] = [
 const ICONS: Record<string, LucideIcon> = {
   Dashboard: LayoutDashboard,
   Announcements: Megaphone,
-  Employees: Users,
-  Candidates: UserPlus,
+  Staff: Users,
+  Departments: Building2,
+  Positions: Briefcase,
+  Projects: FolderKanban,
+  Tasks: ListTodo,
+  'Work Reports': ClipboardList,
   Attendance: CalendarCheck,
   Leave: Plane,
-  Payroll: Wallet,
+  Payments: Banknote,
   Expenses: Receipt,
+  Documents: FileText,
   Training: GraduationCap,
   Performance: Star,
-  Documents: FileText,
   Reports: BarChart3,
-  Roles: ShieldCheck,
+  'Partner Gigs': Handshake,
+  Users: UserCog,
+  'Roles & Permissions': ShieldCheck,
   'Audit Log': ScrollText,
   Settings: Settings,
+  'My Profile': UserCircle,
+  // Legacy / secondary labels
+  Employees: Users,
+  Candidates: UserPlus,
+  Payroll: Wallet,
+  Roles: ShieldCheck,
 }
 
 export function getIcon(label: string): LucideIcon {

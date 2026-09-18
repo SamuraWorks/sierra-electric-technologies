@@ -32,7 +32,7 @@ export default async function CandidatesPage() {
   const candidates = rows ?? []
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-8">
+    <div className="px-4 py-6 sm:px-6 sm:py-8">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="mb-2 text-[10.5px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">

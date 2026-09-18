@@ -10,7 +10,7 @@ export default async function NewCandidatePage() {
   if (!hasPermission(ctx, 'candidates.review')) redirect('/hrm/candidates')
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-8">
+    <div className="px-4 py-6 sm:px-6 sm:py-8">
       <p className="mb-2 text-[10.5px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
         Sierra Electric Technologies — Recruitment
       </p>

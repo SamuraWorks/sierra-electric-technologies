@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
-import { services, projects, projectHref } from '@/lib/site'
+import { services, projects, projectHref, greenshiftGallery } from '@/lib/site'
 
 type FocusItem = { icon: 'check' | 'info'; text: string }
 type Connected = { title: string; icon: 'sprout' | 'recycle' | 'lightbulb' | 'bus' }
@@ -193,6 +193,29 @@ export default async function ProgrammePage({
                       </Link>
                     )
                   })}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {isGreenShift && (
+          <section className="section">
+            <div className="container">
+              <div className="detail-body">
+                <div className="detail-intro">
+                  <p className="section-head__meta">
+                    <span className="cell-idx">Gallery</span>
+                    <span className="kicker">GreenShift moments</span>
+                  </p>
+                  <h2>
+                    The GreenShift <em>gallery.</em>
+                  </h2>
+                </div>
+                <div className="detail-gallery-grid">
+                  {greenshiftGallery.map((photo) => (
+                    <img key={photo.image} src={photo.image} alt={photo.alt} loading="lazy" />
+                  ))}
                 </div>
               </div>
             </div>

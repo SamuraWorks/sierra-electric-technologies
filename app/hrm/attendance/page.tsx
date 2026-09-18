@@ -94,7 +94,7 @@ export default async function AttendancePage({
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-8">
+    <div className="px-4 py-6 sm:px-6 sm:py-8">
       <div className="mb-6">
         <p className="mb-2 text-[10.5px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
           Sierra Electric Technologies — HR
@@ -148,8 +148,8 @@ export default async function AttendancePage({
           </div>
 
           {/* Roster */}
-          <div className="overflow-hidden rounded-[var(--r-md)] border border-[var(--line)] bg-[var(--surface)]">
-            <table className="w-full text-left text-sm">
+          <div className="overflow-x-auto rounded-[var(--r-md)] border border-[var(--line)] bg-[var(--surface)]">
+            <table className="w-full min-w-[680px] text-left text-sm">
               <thead>
                 <tr className="border-b border-[var(--line)] text-[10.5px] font-bold uppercase tracking-[0.12em] text-[var(--muted)]">
                   <th className="px-5 py-3.5">Employee</th>

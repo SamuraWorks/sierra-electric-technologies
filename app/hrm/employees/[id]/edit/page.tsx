@@ -27,7 +27,7 @@ export default async function EditEmployeePage({
   if (!profile) notFound()
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-8">
+    <div className="px-4 py-6 sm:px-6 sm:py-8">
       <Link
         href={`/hrm/employees/${id}`}
         className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--muted)] transition-colors hover:text-[var(--text)]"

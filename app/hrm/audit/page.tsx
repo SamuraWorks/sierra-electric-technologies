@@ -44,7 +44,7 @@ export default async function AuditPage({
   const actions = Array.from(new Set(logs.map((l) => l.action))).sort()
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-8">
+    <div className="px-4 py-6 sm:px-6 sm:py-8">
       <div className="mb-6">
         <p className="mb-2 text-[10.5px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
           Sierra Electric Technologies — System

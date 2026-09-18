@@ -4,6 +4,7 @@ import { Suspense, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ArrowRight } from 'lucide-react'
+import { images } from '@/lib/site'
 
 function LoginForm() {
   const router = useRouter()
@@ -46,11 +47,16 @@ function LoginForm() {
       <div className="pointer-events-none absolute -bottom-24 -left-16 size-80 rounded-full bg-[rgba(47,154,91,0.08)] blur-3xl" />
 
       <div className="relative w-full max-w-md rounded-[var(--r-lg)] border border-[var(--line-2)] bg-[var(--surface)] p-7 shadow-[var(--sh-md)] sm:p-10">
-        <Link href="/" className="flex items-center justify-center gap-3">
-          <span className="grid size-12 place-items-center rounded-[var(--r-sm)] bg-[var(--accent)] font-display text-sm font-bold text-[var(--accent-ink)]">
-            SET
-          </span>
-          <span className="flex flex-col font-mono text-[9px] uppercase tracking-[0.16em] text-[var(--muted)]">
+        <Link href="/" className="flex flex-col items-center justify-center gap-4">
+          <img
+            src={images.logo}
+            alt="Sierra Electric Technologies logo"
+            width={80}
+            height={80}
+            className="rounded-[var(--r-lg)] object-cover"
+            style={{ width: 80, height: 80 }}
+          />
+          <span className="flex flex-col items-center font-mono text-[9px] uppercase tracking-[0.16em] text-[var(--muted)]">
             Sierra Electric Technologies
             <b className="normal-case tracking-[0.04em] text-[var(--text)]">HR Portal</b>
           </span>

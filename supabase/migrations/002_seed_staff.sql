@@ -15,20 +15,20 @@ DECLARE
   d    record;
 BEGIN
   FOR d IN SELECT * FROM (VALUES
-    ('admin@sierraelectric.sl', 'Chief Technology Officer', 'Head Office'),
-    ('hr@syscendhrm.test', 'Head of Human Resources', 'Human Resources'),
-    ('manager@syscendhrm.test', 'Operations Manager', 'Operations'),
-    ('recruiter@syscendhrm.test', 'Talent Acquisition Lead', 'Human Resources'),
-    ('finance@syscendhrm.test', 'Finance Manager', 'Finance'),
-    ('employee@syscendhrm.test', 'Field Technician', 'Field Services')
-  ) AS d(email, position, department)
+    ('samuel540wisesamura@gmail.com', 'Chief Technology Officer', 'Head Office', '232 76 123 001'),
+    ('hr@syscendhrm.test', 'Head of Human Resources', 'Human Resources', '232 76 123 002'),
+    ('manager@syscendhrm.test', 'Operations Manager', 'Operations', '232 76 123 003'),
+    ('recruiter@syscendhrm.test', 'Talent Acquisition Lead', 'Human Resources', '232 76 123 004'),
+    ('finance@syscendhrm.test', 'Finance Manager', 'Finance', '232 76 123 005'),
+    ('employee@syscendhrm.test', 'Field Technician', 'Field Services', '232 76 123 006')
+  ) AS d(email, position, department, phone)
   LOOP
     SELECT id INTO v_id FROM auth.users WHERE email = d.email;
     CONTINUE WHEN v_id IS NULL;
     UPDATE public.profiles
     SET position = d.position,
         department = d.department,
-        phone = '232 76 123 ' || lpad(department::int % 100, 3, '0')
+        phone = d.phone
     WHERE id = v_id;
   END LOOP;
 END $$;

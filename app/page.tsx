@@ -79,6 +79,9 @@ function Hero() {
             About SET
           </Button>
         </div>
+        <a className="hero-staff" href="/auth/login">
+          Staff login <ArrowRight size={11} aria-hidden="true" />
+        </a>
         <div className="hero-facts">
           <div className="hero-fact">
             <b>100%</b>

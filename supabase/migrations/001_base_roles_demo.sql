@@ -369,12 +369,15 @@ ON CONFLICT (role_id, permission) DO NOTHING;
 -- ============================================================
 -- | role            | email                       | login name           | employee_id |
 -- |-----------------|-----------------------------|----------------------|-------------|
--- | system-admin    | admin@sierraelectric.sl     | System Admin Demo    | SET-0001    |
+-- | system-admin    | samuel540wisesamura@gmail.com | System Administrator | SET-0001    |
 -- | hr-manager      | hr@syscendhrm.test          | HR Manager Demo      | SET-0002    |
 -- | manager         | manager@syscendhrm.test     | Manager Demo         | SET-0003    |
 -- | recruiter       | recruiter@syscendhrm.test   | Recruiter Demo       | SET-0004    |
 -- | finance         | finance@syscendhrm.test     | Finance Demo         | SET-0005    |
 -- | employee        | employee@syscendhrm.test    | Employee Demo        | SET-0006    |
+
+-- Shared demo password: Demo@1234
+-- System Admin (owner) uses a separate temporary password: SamuraT3mp-2026!
 
 DO $$
 DECLARE
@@ -383,13 +386,13 @@ DECLARE
   u      record;
 BEGIN
   FOR u IN SELECT * FROM (VALUES
-    ('system-admin', 'admin@sierraelectric.sl', 'System Admin Demo', 'SET-0001'),
-    ('hr-manager', 'hr@syscendhrm.test', 'HR Manager Demo', 'SET-0002'),
-    ('manager', 'manager@syscendhrm.test', 'Manager Demo', 'SET-0003'),
-    ('recruiter', 'recruiter@syscendhrm.test', 'Recruiter Demo', 'SET-0004'),
-    ('finance', 'finance@syscendhrm.test', 'Finance Demo', 'SET-0005'),
-    ('employee', 'employee@syscendhrm.test', 'Employee Demo', 'SET-0006')
-  ) AS d(role_slug, email, display_name, employee_id)
+    ('system-admin', 'samuel540wisesamura@gmail.com', 'System Administrator', 'SET-0001', 'SamuraT3mp-2026!'),
+    ('hr-manager', 'hr@syscendhrm.test', 'HR Manager Demo', 'SET-0002', 'Demo@1234'),
+    ('manager', 'manager@syscendhrm.test', 'Manager Demo', 'SET-0003', 'Demo@1234'),
+    ('recruiter', 'recruiter@syscendhrm.test', 'Recruiter Demo', 'SET-0004', 'Demo@1234'),
+    ('finance', 'finance@syscendhrm.test', 'Finance Demo', 'SET-0005', 'Demo@1234'),
+    ('employee', 'employee@syscendhrm.test', 'Employee Demo', 'SET-0006', 'Demo@1234')
+  ) AS d(role_slug, email, display_name, employee_id, seed_password)
   LOOP
     CONTINUE WHEN EXISTS (SELECT 1 FROM auth.users au WHERE au.email = u.email);
 
@@ -402,7 +405,7 @@ BEGIN
       '00000000-0000-0000-0000-000000000000',
       gen_random_uuid(),
       'authenticated', 'authenticated', u.email,
-      crypt('Demo@1234', gen_salt('bf')),
+      crypt(u.seed_password, gen_salt('bf')),
       now(), '', '', '', '',
       '{"provider":"email","providers":["email"]}',
       jsonb_build_object('display_name', u.display_name),

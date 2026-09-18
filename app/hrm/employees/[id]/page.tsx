@@ -46,7 +46,7 @@ export default async function EmployeeDetailPage({
   ]
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-8">
+    <div className="px-4 py-6 sm:px-6 sm:py-8">
       <Link
         href="/hrm/employees"
         className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--muted)] transition-colors hover:text-[var(--text)]"
@@ -78,7 +78,7 @@ export default async function EmployeeDetailPage({
               {roles.map((r) => (
                 <span
                   key={r.slug}
-                  className="rounded-full border border-[rgba(47,154,91,0.35)] bg-[rgba(47,154,91,0.08)] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]"
+                  className="rounded-full border border-[rgba(37,99,235,0.35)] bg-[rgba(37,99,235,0.08)] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]"
                 >
                   {r.name}
                 </span>

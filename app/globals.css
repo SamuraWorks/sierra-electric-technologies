@@ -62,9 +62,24 @@
   --color-primary: var(--accent);
   --color-border: var(--line);
   --color-muted-foreground: var(--muted);
-  --radius-lg: var(--r-md);
+--radius-lg: var(--r-md);
   --radius-xl: var(--r-lg);
-  --radius-2xl: var(--r-xl);
+
+  /* ─── HR Portal theme (blue/slate — mirrors the classic
+       school-admin layout). Applies only inside .hrm-portal,
+       so the public site keeps its green identity. ─── */
+  --hrm-accent: #2563eb;
+  --hrm-accent-strong: #1d4ed8;
+  --hrm-accent-ink: #ffffff;
+  --hrm-bg: #f8fafc;
+  --hrm-surface: #ffffff;
+  --hrm-surface-2: #f1f5f9;
+  --hrm-text: #0f172a;
+  --hrm-text-2: #475569;
+  --hrm-muted: #94a3b8;
+  --hrm-line: #e2e8f0;
+  --hrm-line-2: #e6ebf2;
+  --hrm-line-accent: rgba(37, 99, 235, 0.5);
 }
 
 /* ---------- Base ---------- */
@@ -664,6 +679,27 @@ ul, ol { margin: 0; padding: 0; }
   margin-top: 44px;
   padding-top: 26px;
   border-top: 1px solid var(--line);
+}
+
+.hero-staff {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-bottom: 1px solid transparent;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.hero-staff:hover {
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 .hero-fact {
@@ -2524,4 +2560,22 @@ ul, ol { margin: 0; padding: 0; }
     transition-duration: 0.01ms !important;
   }
   .reveal { opacity: 1; transform: none; }
+}
+/* ─── HR Portal scoped tokens ─── */
+.hrm-portal {
+  --bg: var(--hrm-bg);
+  --surface: var(--hrm-surface);
+  --surface-2: var(--hrm-surface-2);
+  --text: var(--hrm-text);
+  --text-2: var(--hrm-text-2);
+  --muted: var(--hrm-muted);
+  --accent: var(--hrm-accent);
+  --accent-strong: var(--hrm-accent-strong);
+  --accent-ink: var(--hrm-accent-ink);
+  --line: var(--hrm-line);
+  --line-2: var(--hrm-line-2);
+  --line-accent: var(--hrm-line-accent);
+  --sh-sm: 0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 24px -14px rgba(15, 23, 42, 0.1);
+  --sh-md: 0 2px 6px rgba(15, 23, 42, 0.05), 0 28px 56px -28px rgba(15, 23, 42, 0.18);
+  --sh-cta: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 14px 28px -16px rgba(37, 99, 235, 0.45);
 }

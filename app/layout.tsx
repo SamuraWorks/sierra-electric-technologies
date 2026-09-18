@@ -1,11 +1,22 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Manrope, Space_Grotesk } from 'next/font/google'
+import localFont from 'next/font/local'
 import { ADDRESS, FACEBOOK_URL } from '@/lib/site'
 import './globals.css'
 
-const sans = Manrope({ subsets: ['latin'], variable: '--font-sans', display: 'swap', weight: 'variable' })
-const display = Space_Grotesk({ subsets: ['latin'], variable: '--font-display', display: 'swap', weight: 'variable' })
+// Self-hosted variable fonts (local files) — no runtime fetch from Google Fonts
+const sans = localFont({
+  src: './fonts/manrope.woff2',
+  variable: '--font-sans',
+  display: 'swap',
+  weight: '200 800',
+})
+const display = localFont({
+  src: './fonts/space-grotesk.woff2',
+  variable: '--font-display',
+  display: 'swap',
+  weight: '300 700',
+})
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 

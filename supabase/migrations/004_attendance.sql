@@ -56,7 +56,7 @@ BEGIN
     FOR emp IN SELECT id FROM public.profiles WHERE employee_id IS NOT NULL
     LOOP
       CONTINUE WHEN d = CURRENT_DATE AND skip @> ARRAY[(
-        SELECT email FROM auth.users au WHERE au.id = emp.id
+        SELECT email::text FROM auth.users au WHERE au.id = emp.id
       )];
 
       INSERT INTO public.attendance_records (user_id, date, clock_in, clock_out, note)

@@ -67,7 +67,7 @@ CREATE INDEX IF NOT EXISTS idx_payroll_entries_run ON public.payroll_entries(run
 INSERT INTO public.salary_configs (user_id, gross_salary, currency, bank_name, bank_account)
 SELECT au.id, s.salary, 'SLL', 'Rokel Commercial Bank', s.acct
 FROM (VALUES
-  ('admin@sierraelectric.sl',        38000000, 'RCB-1023-4419'),
+  ('samuel540wisesamura@gmail.com', 38000000, 'RCB-1023-4419'),
   ('hr@syscendhrm.test',             32000000, 'RCB-1023-8821'),
   ('manager@syscendhrm.test',        35000000, 'RCB-1023-0174'),
   ('recruiter@syscendhrm.test',      24000000, 'RCB-1023-5502'),

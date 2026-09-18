@@ -46,7 +46,7 @@ export default async function RolesPage() {
   const canRemove = hasPermission(ctx, 'roles.remove')
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-8">
+    <div className="px-4 py-6 sm:px-6 sm:py-8">
       <p className="mb-2 text-[10.5px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
         Sierra Electric Technologies — HR
       </p>
@@ -72,7 +72,7 @@ export default async function RolesPage() {
                       <p className="flex items-center gap-2 text-sm font-bold text-[var(--text)]">
                         {role.name}
                         {role.is_administrative && (
-                          <span className="rounded-full border border-[rgba(47,154,91,0.35)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-[var(--accent)]">
+                          <span className="rounded-full border border-[rgba(37,99,235,0.35)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-[var(--accent)]">
                             Admin
                           </span>
                         )}

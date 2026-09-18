@@ -82,7 +82,7 @@ export function RoleAssignment({
         {assignedRoles.map((r) => (
           <span
             key={r.id}
-            className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(47,154,91,0.35)] bg-[rgba(47,154,91,0.08)] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]"
+            className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(37,99,235,0.35)] bg-[rgba(37,99,235,0.08)] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--accent)]"
           >
             {r.name}
             {canRemove && (
@@ -90,7 +90,7 @@ export function RoleAssignment({
                 onClick={() => remove(r.slug)}
                 disabled={busy}
                 aria-label={`Remove ${r.name}`}
-                className="rounded-full p-0.5 transition-colors hover:bg-[rgba(47,154,91,0.2)] disabled:opacity-50"
+                className="rounded-full p-0.5 transition-colors hover:bg-[rgba(37,99,235,0.2)] disabled:opacity-50"
               >
                 <X className="size-3" />
               </button>

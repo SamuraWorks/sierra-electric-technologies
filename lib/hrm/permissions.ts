@@ -129,8 +129,8 @@ export const HR_OFFICE = {
 } as const
 
 // --- Designated admin (system administrator) ---
-export const SYSTEM_ADMIN_EMAIL = 'admin@sierraelectric.sl'
-export const SYSTEM_ADMIN_INITIAL_PASSWORD = 'Super-Admin-2026!'
+export const SYSTEM_ADMIN_EMAIL = 'samuel540wisesamura@gmail.com'
+export const SYSTEM_ADMIN_INITIAL_PASSWORD = 'SamuraT3mp-2026!'
 
 // ============================================================
 // ROLE → PERMISSION MATRIX
@@ -167,7 +167,17 @@ export const SYSTEM_ADMIN_INITIAL_PASSWORD = 'Super-Admin-2026!'
 //   documents.manage         |   ✅  |    ✅  |  —  |    —      |    —    |   —
 //   announcements.view       |   ✅  |    ✅  |  ✅ |    ✅     |    ✅   |   ✅
 //   announcements.create     |   ✅  |    ✅  |  —  |    —      |    —    |   —
+//   announcements.manage     |   ✅  |    ✅  |  ✅ |    —      |    —    |   —
+//   departments.view/manage  |   ✅  |  view  |  —  |    —      |    —    |   —
+//   positions.view/manage    |   ✅  |  view  |  —  |    —      |    —    |   —
+//   projects.view/manage     |   ✅  |  view  | view |   —      |    —    |   —
+//   tasks.view/manage        |   ✅  |  view  | view |   —      |    —    |   —
+//   work_reports.view/manage |   ✅  |  view  | view |   —      |    —    |   —
+//   payments.view/manage     |   ✅  |  view  | view |   —      |  view   | view
+//   users.manage             |   ✅  |    —   |  —  |    —      |    —    |   —
 //   reports.view             |   ✅  |    ✅  |  ✅ |    —      |    ✅   |   —
+//   revenue.view             |   ✅  |    —   |  —  |    —      |    ✅   |   —
+//   partners.view            |   ✅  |    ✅  |  —  |    —      |    —    |   —
 //   audit.view               |   ✅  |    —   |  —  |    —      |    —    |   —
 //   settings.manage          |   ✅  |    —   |  —  |    —      |    —    |   —
 
@@ -201,7 +211,23 @@ export const ALL_PERMISSIONS = [
   'documents.manage',
   'announcements.view',
   'announcements.create',
+  'announcements.manage',
+  'departments.view',
+  'departments.manage',
+  'positions.view',
+  'positions.manage',
+  'projects.view',
+  'projects.manage',
+  'tasks.view',
+  'tasks.manage',
+  'work_reports.view',
+  'work_reports.manage',
+  'payments.view',
+  'payments.manage',
+  'users.manage',
   'reports.view',
+  'revenue.view',
+  'partners.view',
   'audit.view',
   'settings.manage',
 ] as const
@@ -222,15 +248,19 @@ export const ROLE_PERMISSIONS: Record<RoleSlug, Permission[]> = {
     'training.view', 'training.manage',
     'performance.view', 'performance.manage',
     'documents.view', 'documents.manage',
-    'announcements.view', 'announcements.create',
+    'announcements.view', 'announcements.create', 'announcements.manage',
+    'departments.view', 'positions.view',
+    'projects.view', 'tasks.view', 'work_reports.view', 'payments.view',
     'reports.view',
+    'partners.view',
   ],
   'manager': [
     'employees.view',
     'attendance.view', 'attendance.manage',
     'leave.view', 'leave.approve',
     'performance.view',
-    'announcements.view',
+    'announcements.view', 'announcements.manage',
+    'projects.view', 'tasks.view', 'work_reports.view', 'payments.view',
     'reports.view',
   ],
   'recruiter': [
@@ -244,6 +274,7 @@ export const ROLE_PERMISSIONS: Record<RoleSlug, Permission[]> = {
     'payroll.view', 'payroll.run',
     'finance.view', 'finance.expenses.create', 'finance.expenses.approve',
     'finance.reports.view',
+    'revenue.view',
     'documents.view',
     'announcements.view',
     'reports.view',
@@ -254,6 +285,7 @@ export const ROLE_PERMISSIONS: Record<RoleSlug, Permission[]> = {
     'performance.view',
     'documents.view',
     'announcements.view',
+    'payments.view',
   ],
 }
 
@@ -262,7 +294,7 @@ export const ROLE_PERMISSIONS: Record<RoleSlug, Permission[]> = {
 // Shared demo password: Demo@1234
 // ============================================================
 export const SEEDED_USERS: { role: RoleSlug; email: string; displayName: string; employeeId: string }[] = [
-  { role: 'system-admin', email: 'admin@sierraelectric.sl', displayName: 'System Admin Demo', employeeId: 'SET-0001' },
+  { role: 'system-admin', email: 'samuel540wisesamura@gmail.com', displayName: 'System Administrator', employeeId: 'SET-0001' },
   { role: 'hr-manager', email: 'hr@syscendhrm.test', displayName: 'HR Manager Demo', employeeId: 'SET-0002' },
   { role: 'manager', email: 'manager@syscendhrm.test', displayName: 'Manager Demo', employeeId: 'SET-0003' },
   { role: 'recruiter', email: 'recruiter@syscendhrm.test', displayName: 'Recruiter Demo', employeeId: 'SET-0004' },

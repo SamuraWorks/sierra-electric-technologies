@@ -1,17 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import {
-  ChevronLeft,
-  ChevronRight,
-  LogOut,
-  Menu,
-  ShieldCheck,
-  LayoutDashboard,
-} from 'lucide-react'
+import { ChevronDown, LogOut, Menu, UserRound, X } from 'lucide-react'
 import { filterNavGroups, getIcon, isActive } from '@/lib/hrm/navigation'
+import { images } from '@/lib/site'
 
 export interface PortalUser {
   userId: string
@@ -28,6 +22,10 @@ interface PortalShellProps {
   user: PortalUser
 }
 
+function cn(...parts: Array<string | false | undefined>) {
+  return parts.filter(Boolean).join(' ')
+}
+
 function initialsOf(name: string): string {
   return name
     .split(' ')
@@ -38,199 +36,260 @@ function initialsOf(name: string): string {
     .toUpperCase()
 }
 
-function SidebarContent({
+const BRAND_NAME = 'Sierra Electric'
+const BRAND_SUBTITLE = 'Staff & Operations'
+
+// ─── Sidebar (the slider) ────────────────────────────────────────
+
+function Sidebar({
   user,
   pathname,
-  collapsed,
-  onNavClick,
+  collapsed = false,
+  onToggle,
+  onClose,
 }: {
   user: PortalUser
   pathname: string
-  collapsed: boolean
-  onNavClick: () => void
+  collapsed?: boolean
+  onToggle?: () => void
+  onClose?: () => void
 }) {
   const groups = filterNavGroups(user.permissions)
 
   return (
-    <>
-      <div
-        className={`flex h-16 items-center border-b border-[var(--line)] px-4 ${
-          collapsed ? 'justify-center' : 'justify-between'
-        }`}
-      >
-        {!collapsed ? (
-          <Link href="/hrm/dashboard" className="flex items-center gap-3">
-            <span className="grid size-8 place-items-center rounded-[var(--r-sm)] bg-[var(--accent)] text-[11px] font-bold text-[var(--accent-ink)]">
-              SET
-            </span>
-            <span className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--text)]">
-              HR Portal
-            </span>
-          </Link>
-        ) : (
-          <Link href="/hrm/dashboard" className="grid size-8 place-items-center rounded-[var(--r-sm)] bg-[var(--accent)] text-[11px] font-bold text-[var(--accent-ink)]">
-            SET
-          </Link>
-        )}
-      </div>
-
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
-        {groups.map((group) => (
-          <div key={group.title} className="mb-4">
-            {!collapsed && (
-              <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--muted)]">
-                {group.title}
-              </p>
-            )}
-            {collapsed && <div className="mx-auto mb-1.5 h-px w-4 bg-[var(--line-2)]" />}
-            <div className="space-y-0.5">
-              {group.items.map((item) => {
-                const Icon = getIcon(item.label)
-                const active = isActive(item.href, pathname, item.exact)
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={onNavClick}
-                    title={item.label}
-                    className={`group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150 ${
-                      collapsed ? 'justify-center' : ''
-                    } ${
-                      active
-                        ? 'bg-[rgba(47,154,91,0.1)] text-[var(--accent)]'
-                        : 'text-[var(--text-2)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]'
-                    }`}
-                  >
-                    <Icon className="size-[17px] shrink-0" />
-                    {!collapsed && <span className="truncate">{item.label}</span>}
-                  </Link>
-                )
-              })}
-            </div>
-          </div>
-        ))}
-      </nav>
-
-      <div className="border-t border-[var(--line)] px-3 py-3">
-        <div className={`flex items-center gap-3 rounded-lg px-2 py-2 ${collapsed ? 'justify-center' : ''}`}>
-          <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[var(--surface-2)] text-xs font-bold uppercase text-[var(--accent-strong)] ring-1 ring-[var(--line-2)]">
-            {initialsOf(user.displayName)}
-          </span>
+    <aside
+      className={cn(
+        'flex h-full flex-col border-r border-slate-200 bg-white transition-[width] duration-300 ease-in-out',
+        collapsed ? 'w-20' : 'w-60',
+      )}
+    >
+      {/* Brand row — the 3-line hamburger sits on the right edge of the slider */}
+      <div className="flex h-16 shrink-0 items-center justify-between border-b border-slate-100 px-1">
+        <Link href="/hrm/dashboard" className="flex min-w-0 items-center gap-3" title="HR dashboard">
+          <img
+            src={images.logo}
+            alt="Sierra Electric Technologies logo"
+            className="h-8 w-8 flex-shrink-0 rounded-lg object-cover"
+            width={32}
+            height={32}
+          />
           {!collapsed && (
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-[var(--text)]">{user.displayName}</p>
-              <p className="truncate text-xs text-[var(--muted)]">{user.roles[0]?.name ?? 'Staff'}</p>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold leading-none text-slate-900">{BRAND_NAME}</p>
+              <p className="mt-0.5 text-xs text-slate-400">{BRAND_SUBTITLE}</p>
             </div>
           )}
-        </div>
+        </Link>
+
+        <button
+          onClick={collapsed ? onToggle : (onClose ?? onToggle)}
+          aria-label={collapsed ? 'Open menu' : 'Close menu'}
+          title={collapsed ? 'Open menu' : 'Close menu'}
+          className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100"
+        >
+          <Menu size={17} />
+        </button>
       </div>
-    </>
+
+      {/* Nav */}
+      <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
+        {groups.map((group) => {
+          if (group.items.length === 0) return null
+          return (
+            <div key={group.title}>
+              {!collapsed && (
+                <p className="mb-1 px-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  {group.title}
+                </p>
+              )}
+              <ul className={collapsed ? 'space-y-1' : 'space-y-0.5'}>
+                {group.items.map((item) => {
+                  const Icon = getIcon(item.label)
+                  const active = isActive(item.href, pathname, item.exact)
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        onClick={onClose}
+                        title={collapsed ? item.label : undefined}
+                        aria-label={collapsed ? item.label : undefined}
+                        className={cn(
+                          'flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors',
+                          collapsed && 'justify-center px-0 py-2',
+                          active
+                            ? 'bg-blue-50 text-blue-700'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                        )}
+                      >
+                        <Icon size={16} className={active ? 'text-blue-600' : 'text-slate-400'} />
+                        {!collapsed && <span>{item.label}</span>}
+                      </Link>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          )
+        })}
+      </nav>
+
+      {/* Footer copyright */}
+      <div className="shrink-0 border-t border-slate-100">
+        {!collapsed && (
+          <p className="px-3 py-3 text-xs leading-snug text-slate-400">
+            © {new Date().getFullYear()} Sierra Electric Staff & Operations.
+          </p>
+        )}
+      </div>
+    </aside>
   )
 }
+
+// ─── Header / profile bar ────────────────────────────────────────
+
+function UserMenu({ user }: { user: PortalUser }) {
+  const [open, setOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function onPointerDown(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', onPointerDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors hover:bg-slate-100"
+        aria-haspopup="menu"
+        aria-expanded={open}
+      >
+        <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">
+          {initialsOf(user.displayName)}
+        </span>
+        <span className="hidden text-left sm:block">
+          <span className="block text-sm font-medium leading-none text-slate-900">{user.displayName}</span>
+          <span className="mt-0.5 block text-xs leading-none text-slate-400">
+            {user.roles[0]?.name ?? 'Staff'}
+          </span>
+        </span>
+        <ChevronDown size={14} className="text-slate-400" />
+      </button>
+
+      {open && (
+        <div
+          role="menu"
+          className="absolute right-0 z-50 mt-2 w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg"
+        >
+          <div className="mb-1 border-b border-slate-100 px-2 py-2">
+            <p className="text-sm font-medium text-slate-900">{user.displayName}</p>
+            <p className="mt-0.5 text-xs text-slate-500">{user.email}</p>
+          </div>
+          <Link
+            href="/hrm/settings"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex w-full items-center rounded-lg px-2 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
+          >
+            <UserRound size={14} className="mr-2" /> Profile Settings
+          </Link>
+          <form action="/auth/sign-out" method="post" className="mt-1 border-t border-slate-100 pt-1">
+            <button
+              type="submit"
+              role="menuitem"
+              className="flex w-full items-center rounded-lg px-2 py-2 text-sm text-red-600 transition-colors hover:bg-red-50"
+            >
+              <LogOut size={14} className="mr-2" /> Sign out
+            </button>
+          </form>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function Header({ user, mobileOpen, onMenuClick }: { user: PortalUser; mobileOpen: boolean; onMenuClick: () => void }) {
+  return (
+    <header className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-6">
+      <div className="flex items-center gap-1">
+        <button
+          onClick={onMenuClick}
+          aria-label="Open menu"
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 lg:hidden"
+        >
+          {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+        </button>
+        <span className="hidden text-sm font-semibold text-slate-900 lg:block">
+          {user.roles[0]?.name ?? 'Portal'}
+        </span>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <UserMenu user={user} />
+      </div>
+    </header>
+  )
+}
+
+// ─── PortalShell ─────────────────────────────────────────────────
 
 export function PortalShell({ children, user }: PortalShellProps) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [collapsed, setCollapsed] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   useEffect(() => {
     setMobileOpen(false)
   }, [pathname])
 
   useEffect(() => {
-    const stored = localStorage.getItem('hrm-sidebar-collapsed')
-    if (stored === 'true') setCollapsed(true)
+    const stored = localStorage.getItem('hrm-sidebar-open')
+    if (stored !== null) setSidebarOpen(stored !== 'false')
   }, [])
 
-  const toggleCollapse = () => {
-    setCollapsed((prev) => {
+  const toggleSidebar = () => {
+    setSidebarOpen((prev) => {
       const next = !prev
-      localStorage.setItem('hrm-sidebar-collapsed', String(next))
+      localStorage.setItem('hrm-sidebar-open', String(next))
       return next
     })
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--bg)]">
-      {/* Desktop sidebar */}
-      <aside
-        className={`relative hidden flex-col border-r border-[var(--line)] bg-[var(--surface)] transition-all duration-300 ease-in-out lg:flex ${
-          collapsed ? 'w-[60px]' : 'w-60'
-        }`}
-      >
-        <div className="absolute -right-3 top-[1.625rem] z-10">
-          <button
-            onClick={toggleCollapse}
-            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            className="grid size-6 place-items-center rounded-full border border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] shadow-sm transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
-          >
-            {collapsed ? <ChevronRight className="size-3" /> : <ChevronLeft className="size-3" />}
-          </button>
+    <div className="hrm-portal flex h-screen overflow-hidden bg-slate-50">
+      {/* Desktop sidebar — slides in/out via the hamburger on the slider */}
+      <div className="hidden h-full lg:block">
+        <Sidebar user={user} pathname={pathname} collapsed={!sidebarOpen} onToggle={toggleSidebar} />
+      </div>
+
+      {/* Mobile drawer — slides in/out on demand */}
+      <div className={`fixed inset-0 z-40 lg:hidden ${mobileOpen ? '' : 'pointer-events-none'}`} aria-hidden={!mobileOpen}>
+        <div
+          onClick={() => setMobileOpen(false)}
+          className={`absolute inset-0 bg-slate-900/50 transition-opacity duration-200 ${mobileOpen ? 'opacity-100' : 'opacity-0'}`}
+        />
+        <div
+          className={`absolute inset-y-0 left-0 transition-transform duration-300 ease-in-out ${
+            mobileOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <Sidebar user={user} pathname={pathname} onClose={() => setMobileOpen(false)} />
         </div>
-        <SidebarContent user={user} pathname={pathname} collapsed={collapsed} onNavClick={() => {}} />
-      </aside>
+      </div>
 
-      {/* Mobile sidebar */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 flex lg:hidden">
-          <button
-            aria-label="Close menu"
-            className="absolute inset-0 bg-black/30"
-            onClick={() => setMobileOpen(false)}
-          />
-          <div className="relative flex w-60 flex-col bg-[var(--surface)] shadow-[var(--sh-md)]">
-            <SidebarContent user={user} pathname={pathname} collapsed={false} onNavClick={() => setMobileOpen(false)} />
-          </div>
-        </div>
-      )}
-
-      {/* Main area */}
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-[var(--line)] bg-[var(--surface)]/95 px-4 backdrop-blur-md lg:px-6">
-          <div className="flex w-full items-center gap-4">
-            <button
-              onClick={() => (window.innerWidth >= 1024 ? toggleCollapse() : setMobileOpen(true))}
-              aria-label="Toggle menu"
-              className="rounded-lg p-2 text-[var(--muted)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
-            >
-              <Menu className="size-5" />
-            </button>
-
-            <div className="flex flex-1 items-center gap-1.5 text-sm text-[var(--muted)]">
-              <Link href="/hrm/dashboard" className="flex items-center gap-1.5 transition-colors hover:text-[var(--text)]">
-                <LayoutDashboard className="size-4 text-[var(--accent)]" />
-                HR Portal
-              </Link>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <span className="hidden items-center gap-1.5 rounded-full border border-[rgba(47,154,91,0.35)] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--accent)] sm:flex">
-                <ShieldCheck className="size-3" />
-                {user.roles[0]?.name ?? 'Staff'}
-              </span>
-
-              <div className="flex items-center gap-2 rounded-lg px-1.5 py-1">
-                <span className="grid size-8 place-items-center rounded-full bg-[var(--surface-2)] text-[10px] font-bold uppercase text-[var(--accent-strong)] ring-1 ring-[var(--line-2)]">
-                  {initialsOf(user.displayName)}
-                </span>
-                <span className="hidden text-sm font-semibold text-[var(--text)] sm:block">
-                  {user.displayName}
-                </span>
-              </div>
-
-              <form action="/auth/sign-out" method="post">
-                <button
-                  type="submit"
-                  aria-label="Sign out"
-                  className="rounded-lg p-2 text-[var(--muted)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
-                >
-                  <LogOut className="size-4" />
-                </button>
-              </form>
-            </div>
-          </div>
-        </header>
-
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <Header user={user} mobileOpen={mobileOpen} onMenuClick={() => setMobileOpen((v) => !v)} />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
