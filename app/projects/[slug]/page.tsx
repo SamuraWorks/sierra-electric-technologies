@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
-import { projectHref, projects } from '@/lib/site'
+import { projectHref, projects, images } from '@/lib/site'
 
 const projectDetails: Record<string, { details: string[]; focus: string[] }> = {
   'Electric Shuttle': {
@@ -164,6 +164,23 @@ export default async function ProjectPage({
           <h1>{project.title}</h1>
           <p className="detail-summary">{project.description}</p>
         </section>
+
+        {project.image && (
+          <section className="section">
+            <div className="container">
+              <div className="detail-gallery-grid">
+                <img src={project.image} alt={project.imageAlt ?? project.title} loading="lazy" />
+                {project.title === 'Electric Shuttle' && (
+                  <img
+                    src={images.keke}
+                    alt="The SET electric Keke, an accessible electric conversion"
+                    loading="lazy"
+                  />
+                )}
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="section">
           <div className="container">

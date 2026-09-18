@@ -9,7 +9,13 @@ const CDN = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/'
 
 export const images = {
   logo: `${CDN}1776285047875-mvtv8fMkk7osjEWCypeWq12mH6xUoD.jpg`,
-  shuttle: `${CDN}10%20Passenger%20E%20car%20for%20Africell%20Made%20by%20Sierra%20Electric.jfif-ZaMipho7TuDliZqhJp2H8U3QOYEpNi.jpeg`,
+  shuttle: '/images/electric-shuttle.jpg',
+  keke: '/images/electric-keke.jpg',
+  handWashingMachine: '/images/hand-washing-machine.jpg',
+  solarBackpack: '/images/solar-backpack.jpg',
+  lamp: '/images/device-to-lamp.jpg',
+  ceoWithMinister: '/images/ceo-with-minister.jpg',
+  founderAndCo: '/images/founder-and-co.jpg',
   workshop: `${CDN}IMG-20260811-WA0016-Yig3FYAvJI3CxTFC47olxk8ZZVTkaZ.jpg`,
   engineer: `${CDN}1786993801626-l1z3FnX2M1ZM9KAvn4rafgclZAFQ7g.jpg`,
   blackVehicle: `${CDN}0f360a7e-ec58-4bb6-9d73-f39bc5d453df%20%281%29.jfif-xN5PgLAjYsfbRMkXdFvidbMRQpcTDR.jpeg`,
@@ -63,13 +69,13 @@ function slugForTitle(title: string) {
 
 export const projects: Project[] = [
   { title: 'Electric Shuttle', tag: 'Built / mobility', image: images.shuttle, imageAlt: 'An electric shuttle minibus built by Sierra Electric Technologies', description: 'Sierra Leone’s first 100% electric shuttle minibus, with accessibility considerations and 75% locally sourced materials.' },
-  { title: 'First Electric Keke', tag: 'Built / accessible mobility', description: 'SET built an electric Keke that can carry passengers, including people using wheelchairs.' },
-  { title: 'Solar Backpack', tag: 'Pilot / energy + education', description: 'A solar-generating backpack concept that supports study lighting and device charging.' },
-  { title: 'Device-to-Lamp', tag: 'Circular economy', description: 'Repurposing old electronic devices into practical study lamps while reducing e-waste.' },
+  { title: 'First Electric Keke', tag: 'Built / accessible mobility', image: images.keke, imageAlt: 'An electric Keke built by Sierra Electric Technologies', description: 'SET built an electric Keke that can carry passengers, including people using wheelchairs.' },
+  { title: 'Solar Backpack', tag: 'Pilot / energy + education', image: images.solarBackpack, imageAlt: 'A solar-powered backpack built by Sierra Electric Technologies', description: 'A solar-generating backpack concept that supports study lighting and device charging.' },
+  { title: 'Device-to-Lamp', tag: 'Circular economy', image: images.lamp, imageAlt: 'A device repurposed into a practical study lamp by Sierra Electric Technologies', description: 'Repurposing old electronic devices into practical study lamps while reducing e-waste.' },
   { title: 'GreenShift Systems', tag: 'Flagship blueprint', description: 'An integrated model connecting solar charging, electric mobility and climate-smart agriculture.' },
   { title: 'Smart Farm', tag: 'Demonstration site', description: 'A living site for solar-powered irrigation, weather monitoring, composting and crop-health research.' },
   { title: 'Electric Mini Bus', tag: 'Development direction / mobility', description: 'A larger electric public-transport direction building on SET’s shuttle and vehicle engineering work.' },
-  { title: 'Automated Hand-Washing Machine', tag: 'Prototype / public health', description: 'An automated hand-washing concept designed to make hygiene safer, more consistent and easier to access.' },
+  { title: 'Automated Hand-Washing Machine', tag: 'Prototype / public health', image: images.handWashingMachine, imageAlt: 'An automated solar-powered hand-washing machine prototype', description: 'An automated hand-washing concept designed to make hygiene safer, more consistent and easier to access.' },
   { title: 'Sierra Circular Energy Initiative', tag: 'Circular energy / youth employment', description: 'A youth-led circular model repurposing mobile e-waste and solar batteries into affordable solar backpacks, lighting kits and portable charging units for underserved communities.' },
   { title: 'Electric Farm Vehicle SEFT-V', tag: 'Validated design / smart agriculture', description: 'A locally manufacturable four-wheel solar-assisted electric farm vehicle designed for approximately 500 kg of produce, tools and farm transport across rural terrain.' },
 ]
@@ -100,7 +106,8 @@ export const media: MediaCard[] = [
   { kicker: 'Training in the room', image: images.trainingRoom, alt: 'SET team members and trainees working together in a training room', description: 'Practical learning, technical confidence and collaboration.' },
   { kicker: 'Workshop at Freetown Innovation Lab', image: images.workshopTeam, alt: 'SET team working around electric vehicle components in the workshop', description: 'Engineering teams examine batteries, wiring and mobility systems.' },
   { kicker: 'On television and in public', image: images.panel, alt: 'SET team members speaking on a public panel', description: 'SET’s climate and technology work reaches wider conversations.' },
-  { kicker: 'Recognition and milestones', image: images.recognition, alt: 'SET team members holding a STEM Africa Fest certificate of recognition', description: 'Team achievements that document SET’s growing ecosystem.' },
+  { kicker: 'Recognition and milestones', image: images.ceoWithMinister, alt: 'SET founder and CEO meeting a Minister', description: 'Team achievements that document SET’s growing ecosystem.' },
+  { kicker: 'Representing SET at Youth Day', image: images.founderAndCo, alt: 'James and the co-founder representing Sierra Electric Technologies at a Youth Day programme', description: 'James Samba and the co-founder representing the team at a Youth Day programme.' },
 ]
 
 export type Programme = {
