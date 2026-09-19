@@ -197,12 +197,12 @@ function UserMenu({ user }: { user: PortalUser }) {
             <p className="mt-0.5 text-xs text-slate-500">{user.email}</p>
           </div>
           <Link
-            href="/hrm/settings"
+            href="/hrm/profile"
             role="menuitem"
             onClick={() => setOpen(false)}
             className="flex w-full items-center rounded-lg px-2 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
           >
-            <UserRound size={14} className="mr-2" /> Profile Settings
+            <UserRound size={14} className="mr-2" /> My Profile
           </Link>
           <form action="/auth/sign-out" method="post" className="mt-1 border-t border-slate-100 pt-1">
             <button
