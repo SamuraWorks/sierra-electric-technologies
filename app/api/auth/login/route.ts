@@ -24,22 +24,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey =
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  if (!supabaseUrl) {
-    return NextResponse.json(
-      { error: 'Sign-in service is missing the NEXT_PUBLIC_SUPABASE_URL environment variable.' },
-      { status: 500 },
-    )
-  }
-  if (!supabaseKey) {
-    return NextResponse.json(
-      { error: 'Sign-in service is missing the NEXT_PUBLIC_SUPABASE_ANON_KEY (or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) environment variable.' },
-      { status: 500 },
-    )
-  }
-
   const MAX_ATTEMPTS = 3
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     let result: { error: { message: string } | null }
