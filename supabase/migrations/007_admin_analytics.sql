@@ -69,11 +69,11 @@ WHERE r.slug = 'system-admin'
 ON CONFLICT (role_id, permission) DO NOTHING;
 
 INSERT INTO public.role_permissions (role_id, permission)
-SELECT r.id, 'revenue.view' FROM public.roles r WHERE r.slug = 'finance'
+SELECT r.id, 'revenue.view' FROM public.roles r WHERE r.slug IN ('administrator', 'ceo', 'co-founder')
 ON CONFLICT (role_id, permission) DO NOTHING;
 
 INSERT INTO public.role_permissions (role_id, permission)
-SELECT r.id, 'partners.view' FROM public.roles r WHERE r.slug = 'hr-manager'
+SELECT r.id, 'partners.view' FROM public.roles r WHERE r.slug IN ('administrator', 'ceo', 'co-founder')
 ON CONFLICT (role_id, permission) DO NOTHING;
 
 -- ------------------------------------------------------------------

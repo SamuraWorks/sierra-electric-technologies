@@ -35,7 +35,7 @@ export default async function AttendancePage({
   const prevDate = new Date(new Date(selected + 'T00:00:00').getTime() - 86400000).toISOString().slice(0, 10)
   const nextDate = new Date(new Date(selected + 'T00:00:00').getTime() + 86400000).toISOString().slice(0, 10)
 
-  const isPeopleOps = hasPermission(ctx, 'attendance.manage') || ctx.roleSlugs.includes('hr-manager') || ctx.roleSlugs.includes('system-admin')
+  const isPeopleOps = hasPermission(ctx, 'attendance.manage') || ctx.roleSlugs.includes('system-admin') || ctx.roleSlugs.includes('administrator')
 
   // Own record + team roster
   const [ownRes, rosterRes, staffRes] = await Promise.all([

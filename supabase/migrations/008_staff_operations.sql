@@ -228,13 +228,13 @@ INSERT INTO public.role_permissions (role_id, permission)
 SELECT r.id, p.perm FROM public.roles r, (VALUES
   ('departments.view'), ('positions.view'), ('projects.view'), ('tasks.view'),
   ('work_reports.view'), ('payments.view'), ('announcements.manage')
-) AS p(perm) WHERE r.slug = 'hr-manager'
+) AS p(perm) WHERE r.slug = 'administrator'
 ON CONFLICT (role_id, permission) DO NOTHING;
 
 INSERT INTO public.role_permissions (role_id, permission)
 SELECT r.id, p.perm FROM public.roles r, (VALUES
   ('projects.view'), ('tasks.view'), ('work_reports.view'), ('payments.view'), ('announcements.manage')
-) AS p(perm) WHERE r.slug = 'manager'
+) AS p(perm) WHERE r.slug = 'co-founder'
 ON CONFLICT (role_id, permission) DO NOTHING;
 
 INSERT INTO public.role_permissions (role_id, permission)
@@ -265,48 +265,15 @@ FROM (VALUES
 ) AS v(name, slug, description, head_employee_id)
 WHERE NOT EXISTS (SELECT 1 FROM public.departments);
 
-INSERT INTO public.positions (name, slug, description, responsibilities, department_id)
-SELECT v.name, v.slug, v.description, v.responsibilities,
-  (SELECT id FROM public.departments d WHERE d.slug = v.dept_slug)
-FROM (VALUES
-  ('Administrator', 'administrator', 'Company administration and operational oversight.', 'Coordinate operations, review approvals, manage company-wide activity.', 'head-office'),
-  ('System Administrator', 'system-administrator', 'Owner of the company systems and access.', 'Manage users, roles, permissions, audit log and system settings.', 'head-office'),
-  ('Software Engineer', 'software-engineer', 'Builds and maintains company software and platforms.', 'Develop features, fix bugs, ship releases and support internal tools.', 'engineering'),
-  ('Electrical Engineer', 'electrical-engineer', 'Electrical design and project engineering.', 'Design systems, supervise installations, ensure quality and safety.', 'engineering'),
-  ('Engineering Lead', 'engineering-lead', 'Leads engineering delivery teams.', 'Own technical delivery, review designs and mentor the team.', 'engineering'),
-  ('Media Officer', 'media-officer', 'Company communications and media.', 'Produce content, manage channels and support stakeholder communications.', 'head-office'),
-  ('Project Engineer', 'project-engineer', 'Engineers assigned to specific projects.', 'Deliver project engineering tasks on schedule and budget.', 'engineering'),
-  ('Systems Administrator', 'systems-administrator', 'Maintains IT infrastructure and systems.', 'Manage servers, networks and internal platforms.', 'engineering'),
-  ('Finance Manager', 'finance-manager', 'Owns financial planning and control.', 'Oversee payments, expenses, cash flow and financial reports.', 'finance'),
-  ('HR Officer', 'hr-officer', 'Supports people operations.', 'Maintain staff records, leave and payroll inputs.', 'human-resources'),
-  ('Accounts Officer', 'accounts-officer', 'Processes financial transactions.', 'Record payments, reconcile accounts and support month-end.', 'finance'),
-  ('Site Supervisor', 'site-supervisor', 'Supervises field work at sites.', 'Coordinate crews, enforce safety and report progress.', 'field-services'),
-  ('Sales Executive', 'sales-executive', 'Sells company products and services.', 'Win new business and grow existing accounts.', 'sales'),
-  ('Field Technician', 'field-technician', 'Installs and services equipment in the field.', 'Carry out installs, checks and repairs on site.', 'field-services')
-) AS v(name, slug, description, responsibilities, dept_slug)
-WHERE NOT EXISTS (SELECT 1 FROM public.positions);
-
--- Personalise the owner account
+-- Personalise the owner account (display name only — no position assigned yet)
 UPDATE public.profiles
-SET display_name = 'Samuel Samura',
-    position = 'Administrator'
+SET display_name = 'Samuel Samura'
 WHERE email = 'samuel540wisesamura@gmail.com';
 
--- Link Samuel's three positions
-INSERT INTO public.profile_positions (profile_id, position_id)
-SELECT p.id, pos.id
-FROM public.profiles p
-JOIN public.positions pos ON pos.slug IN ('administrator', 'system-administrator', 'software-engineer')
-WHERE p.email = 'samuel540wisesamura@gmail.com'
-ON CONFLICT (profile_id, position_id) DO NOTHING;
-
--- Link remaining staff to positions by matching their profile position text
-INSERT INTO public.profile_positions (profile_id, position_id)
-SELECT p.id, pos.id
-FROM public.profiles p
-JOIN public.positions pos ON lower(pos.name) = lower(p.position)
-WHERE p.position IS NOT NULL AND p.position <> ''
-ON CONFLICT (profile_id, position_id) DO NOTHING;
+-- NOTE: job positions and profile↔position assignments are intentionally NOT
+-- seeded yet. The positions / profile_positions tables are ready for them —
+-- positions and responsibilities will be provided later and assigned to
+-- existing portal types (no new portal types required).
 
 -- Projects
 INSERT INTO public.projects (name, description, lead_id, department_id, status, priority, start_date, target_date, progress)
@@ -425,4 +392,4 @@ FROM (VALUES
 ) AS v(title, body, audience, priority, is_pinned, days_ago)
 WHERE NOT EXISTS (SELECT 1 FROM public.announcements);
 
-select 'Staff & Operations schema seeded (departments, positions, projects, tasks, work reports, payments)' as status;
+select 'Staff & Operations schema seeded (departments, projects, tasks, work reports, payments, announcements). Positions left for later assignment.' as status;

@@ -2,13 +2,12 @@
 // Sierra Electric Technologies HRM — Roles & Permissions
 // ============================================================
 
-// --- Role slugs ---
+// --- Role slugs (the 5 portal types) ---
 export const ROLE_SLUGS = {
   SYSTEM_ADMIN: 'system-admin',
-  HR_MANAGER: 'hr-manager',
-  MANAGER: 'manager',
-  RECRUITER: 'recruiter',
-  FINANCE: 'finance',
+  CEO: 'ceo',
+  CO_FOUNDER: 'co-founder',
+  ADMINISTRATOR: 'administrator',
   EMPLOYEE: 'employee',
 } as const
 
@@ -136,50 +135,39 @@ export const SYSTEM_ADMIN_INITIAL_PASSWORD = 'SamuraT3mp-2026!'
 // ROLE → PERMISSION MATRIX
 // ============================================================
 //
-//   permission               | Admin | HR Mgr | Mgr | Recruiter | Finance | Employee
-//   -------------------------|-------|--------|-----|-----------|---------|---------
-//   employees.view           |   ✅  |    ✅  |  ✅ |    ✅     |    ✅   |   —
-//   employees.manage         |   ✅  |    ✅  |  —  |    —      |    —    |   —
-//   roles.view               |   ✅  |    —   |  —  |    —      |    —    |   —
-//   roles.assign             |   ✅  |    —   |  —  |    —      |    —    |   —
-//   roles.remove             |   ✅  |    —   |  —  |    —      |    —    |   —
-//   candidates.view          |   ✅  |    ✅  |  —  |    ✅     |    —    |   —
-//   candidates.review        |   ✅  |    ✅  |  —  |    ✅     |    —    |   —
-//   candidates.shortlist     |   ✅  |    ✅  |  —  |    ✅     |    —    |   —
-//   candidates.interview     |   ✅  |    ✅  |  —  |    ✅     |    —    |   —
-//   candidates.decide        |   ✅  |    ✅  |  —  |    ✅     |    —    |   —
-//   attendance.view          |   ✅  |    ✅  |  ✅ |    —      |    —    |   ✅
-//   attendance.manage        |   ✅  |    ✅  |  ✅ |    —      |    —    |   —
-//   leave.view               |   ✅  |    ✅  |  ✅ |    —      |    —    |   ✅
-//   leave.manage             |   ✅  |    ✅  |  —  |    —      |    —    |   —
-//   leave.approve            |   ✅  |    ✅  |  ✅ |    —      |    —    |   —
-//   payroll.view             |   ✅  |    ✅  |  —  |    —      |    ✅   |   —
-//   payroll.run              |   ✅  |    —   |  —  |    —      |    ✅   |   —
-//   finance.view             |   ✅  |    ✅  |  —  |    —      |    ✅   |   —
-//   finance.expenses.create  |   ✅  |    —   |  —  |    —      |    ✅   |   —
-//   finance.expenses.approve |   ✅  |    —   |  —  |    —      |    ✅   |   —
-//   finance.reports.view     |   ✅  |    —   |  —  |    —      |    ✅   |   —
-//   training.view            |   ✅  |    ✅  |  —  |    —      |    —    |   —
-//   training.manage          |   ✅  |    ✅  |  —  |    —      |    —    |   —
-//   performance.view         |   ✅  |    ✅  |  ✅ |    —      |    —    |   ✅
-//   performance.manage       |   ✅  |    ✅  |  —  |    —      |    —    |   —
-//   documents.view           |   ✅  |    ✅  |  —  |    —      |    ✅   |   ✅
-//   documents.manage         |   ✅  |    ✅  |  —  |    —      |    —    |   —
-//   announcements.view       |   ✅  |    ✅  |  ✅ |    ✅     |    ✅   |   ✅
-//   announcements.create     |   ✅  |    ✅  |  —  |    —      |    —    |   —
-//   announcements.manage     |   ✅  |    ✅  |  ✅ |    —      |    —    |   —
-//   departments.view/manage  |   ✅  |  view  |  —  |    —      |    —    |   —
-//   positions.view/manage    |   ✅  |  view  |  —  |    —      |    —    |   —
-//   projects.view/manage     |   ✅  |  view  | view |   —      |    —    |   —
-//   tasks.view/manage        |   ✅  |  view  | view |   —      |    —    |   —
-//   work_reports.view/manage |   ✅  |  view  | view |   —      |    —    |   —
-//   payments.view/manage     |   ✅  |  view  | view |   —      |  view   | view
-//   users.manage             |   ✅  |    —   |  —  |    —      |    —    |   —
-//   reports.view             |   ✅  |    ✅  |  ✅ |    —      |    ✅   |   —
-//   revenue.view             |   ✅  |    —   |  —  |    —      |    ✅   |   —
-//   partners.view            |   ✅  |    ✅  |  —  |    —      |    —    |   —
-//   audit.view               |   ✅  |    —   |  —  |    —      |    —    |   —
-//   settings.manage          |   ✅  |    —   |  —  |    —      |    —    |   —
+//   permission               | S. Admin | CEO | Founder | Admin | Staff
+//   -------------------------|----------|-----|---------|-------|------
+//   employees.view           |    ✅    | ✅  |    ✅   |   ✅  |  —
+//   employees.manage         |    ✅    | ✅  |    ✅   |   ✅  |  —
+//   roles.view/assign/remove |    ✅    | ✅  |    ✅   |   —   |  —
+//   candidates.*             |    ✅    | ✅  |    ✅   |   ✅  |  —
+//   attendance.*             |    ✅    | ✅  |    ✅   |   ✅  | view
+//   leave.*                  |    ✅    | ✅  |    ✅   |   ✅  | view
+//   payroll.*                |    ✅    | ✅  |    ✅   |   ✅  |  —
+//   finance.*                |    ✅    | ✅  |    ✅   |   ✅  |  —
+//   training.*               |    ✅    | ✅  |    ✅   |   ✅  | view
+//   performance.*            |    ✅    | ✅  |    ✅   |   ✅  | view
+//   documents.*              |    ✅    | ✅  |    ✅   |   ✅  | view
+//   announcements.*          |    ✅    | ✅  |    ✅   |   ✅  | view
+//   departments.*            |    ✅    | ✅  |    ✅   |   ✅  |  —
+//   positions.*              |    ✅    | ✅  |    ✅   |   ✅  |  —
+//   projects.*               |    ✅    | ✅  |    ✅   |   ✅  |  —
+//   tasks.*                  |    ✅    | ✅  |    ✅   |   ✅  | view
+//   work_reports.*           |    ✅    | ✅  |    ✅   |   ✅  | view
+//   payments.*               |    ✅    | ✅  |    ✅   |   ✅  | view
+//   users.manage             |    ✅    | ✅  |    ✅   |   —   |  —
+//   reports.view             |    ✅    | ✅  |    ✅   |   ✅  |  —
+//   revenue.view             |    ✅    | ✅  |    ✅   |   ✅  |  —
+//   partners.view            |    ✅    | ✅  |    ✅   |   ✅  |  —
+//   audit.view               |    ✅    | ✅  |    ✅   |   —   |  —
+//   settings.manage          |    ✅    | ✅  |    ✅   |   —   |  —
+//
+//   • System Admin / CEO / Co-Founder have full access.
+//   • Administrator runs the business (HR, ops, finance, company
+//     modules) with all business permissions except the system-level
+//     keys (roles.*, users.manage, audit.view, settings.manage).
+//   • Staff Member is self-service: own attendance/leave/payments,
+//     tasks, work reports and company announcements.
 
 export const ALL_PERMISSIONS = [
   'employees.view',
@@ -235,50 +223,21 @@ export const ALL_PERMISSIONS = [
 export type Permission = (typeof ALL_PERMISSIONS)[number]
 
 // --- Single source of truth for seeding & guards ---
+// System-level keys reserved for System Admin + full-access tiers
+const SYSTEM_ONLY_PERMISSIONS: Permission[] = [
+  'roles.view',
+  'roles.assign',
+  'roles.remove',
+  'users.manage',
+  'audit.view',
+  'settings.manage',
+]
+
 export const ROLE_PERMISSIONS: Record<RoleSlug, Permission[]> = {
   'system-admin': [...ALL_PERMISSIONS],
-  'hr-manager': [
-    'employees.view', 'employees.manage',
-    'candidates.view', 'candidates.review', 'candidates.shortlist',
-    'candidates.interview', 'candidates.decide',
-    'attendance.view', 'attendance.manage',
-    'leave.view', 'leave.manage', 'leave.approve',
-    'payroll.view',
-    'finance.view',
-    'training.view', 'training.manage',
-    'performance.view', 'performance.manage',
-    'documents.view', 'documents.manage',
-    'announcements.view', 'announcements.create', 'announcements.manage',
-    'departments.view', 'positions.view',
-    'projects.view', 'tasks.view', 'work_reports.view', 'payments.view',
-    'reports.view',
-    'partners.view',
-  ],
-  'manager': [
-    'employees.view',
-    'attendance.view', 'attendance.manage',
-    'leave.view', 'leave.approve',
-    'performance.view',
-    'announcements.view', 'announcements.manage',
-    'projects.view', 'tasks.view', 'work_reports.view', 'payments.view',
-    'reports.view',
-  ],
-  'recruiter': [
-    'employees.view',
-    'candidates.view', 'candidates.review', 'candidates.shortlist',
-    'candidates.interview', 'candidates.decide',
-    'announcements.view',
-  ],
-  'finance': [
-    'employees.view',
-    'payroll.view', 'payroll.run',
-    'finance.view', 'finance.expenses.create', 'finance.expenses.approve',
-    'finance.reports.view',
-    'revenue.view',
-    'documents.view',
-    'announcements.view',
-    'reports.view',
-  ],
+  'ceo': [...ALL_PERMISSIONS],
+  'co-founder': [...ALL_PERMISSIONS],
+  'administrator': [...ALL_PERMISSIONS].filter((p) => !SYSTEM_ONLY_PERMISSIONS.includes(p)),
   'employee': [
     'attendance.view',
     'leave.view',
@@ -286,18 +245,20 @@ export const ROLE_PERMISSIONS: Record<RoleSlug, Permission[]> = {
     'documents.view',
     'announcements.view',
     'payments.view',
+    'tasks.view',
+    'work_reports.view',
   ],
 }
 
 // ============================================================
-// DEMO / SEEDED USERS (one login per role)
+// DEMO / SEEDED USERS (one login per portal type)
 // Shared demo password: Demo@1234
 // ============================================================
 export const SEEDED_USERS: { role: RoleSlug; email: string; displayName: string; employeeId: string }[] = [
   { role: 'system-admin', email: 'samuel540wisesamura@gmail.com', displayName: 'System Administrator', employeeId: 'SET-0001' },
-  { role: 'hr-manager', email: 'hr@syscendhrm.test', displayName: 'HR Manager Demo', employeeId: 'SET-0002' },
-  { role: 'manager', email: 'manager@syscendhrm.test', displayName: 'Manager Demo', employeeId: 'SET-0003' },
-  { role: 'recruiter', email: 'recruiter@syscendhrm.test', displayName: 'Recruiter Demo', employeeId: 'SET-0004' },
-  { role: 'finance', email: 'finance@syscendhrm.test', displayName: 'Finance Demo', employeeId: 'SET-0005' },
-  { role: 'employee', email: 'employee@syscendhrm.test', displayName: 'Employee Demo', employeeId: 'SET-0006' },
+  { role: 'administrator', email: 'hr@syscendhrm.test', displayName: 'Administrator Demo', employeeId: 'SET-0002' },
+  { role: 'co-founder', email: 'manager@syscendhrm.test', displayName: 'Co-Founder Demo', employeeId: 'SET-0003' },
+  { role: 'ceo', email: 'recruiter@syscendhrm.test', displayName: 'CEO Demo', employeeId: 'SET-0004' },
+  { role: 'employee', email: 'finance@syscendhrm.test', displayName: 'Staff Member Demo', employeeId: 'SET-0005' },
+  { role: 'employee', email: 'employee@syscendhrm.test', displayName: 'Staff Member Demo', employeeId: 'SET-0006' },
 ]

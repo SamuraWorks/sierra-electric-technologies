@@ -74,20 +74,13 @@ export function isAdmin(ctx: AuthContext | null): boolean {
   return hasRole(ctx, 'system-admin')
 }
 
+// Full-access tiers: System Admin, CEO, Co-Founder
+export function isFullAccess(ctx: AuthContext | null): boolean {
+  return hasAnyRole(ctx, ['system-admin', 'ceo', 'co-founder'])
+}
+
 export function isHR(ctx: AuthContext | null): boolean {
-  return hasRole(ctx, 'hr-manager') || isAdmin(ctx)
-}
-
-export function isManager(ctx: AuthContext | null): boolean {
-  return hasRole(ctx, 'manager') || isHR(ctx) || isAdmin(ctx)
-}
-
-export function isFinance(ctx: AuthContext | null): boolean {
-  return hasRole(ctx, 'finance')
-}
-
-export function isRecruiter(ctx: AuthContext | null): boolean {
-  return hasRole(ctx, 'recruiter')
+  return hasRole(ctx, 'administrator') || isAdmin(ctx)
 }
 
 export function getPrimaryRole(ctx: AuthContext | null): Role | null {

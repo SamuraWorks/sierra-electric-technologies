@@ -3,16 +3,16 @@
 -- >>>>>>>>>> FILE: 001_base_roles_demo.sql <<<<<<<<<<
 
 -- ============================================================
--- Sierra Electric Technologies HRM â€” Base Schema + Roles + Demo Users
--- Run in Supabase SQL Editor. Idempotent â€” safe to re-run.
+-- Sierra Electric Technologies HRM — Base Schema + Roles + Demo Users
+-- Run in Supabase SQL Editor. Idempotent — safe to re-run.
 --
 -- Creates:
 --   * profiles (extends auth.users)
 --   * roles, role_permissions, user_roles (RBAC)
 --   * helper SQL functions (user_has_permission, user_role_slugs, etc.)
---   * 6 roles with permission matrix (Admin, HR Manager, Manager,
---     Recruiter, Finance, Employee)
---   * 6 demo users, one per role (shared password: Demo@1234)
+--   * the 5 portal types: System Administrator, CEO, Co-Founder,
+--     Administrator, Staff Member
+--   * 6 demo users (one per portal type, two staff demos); shared password: Demo@1234
 -- ============================================================
 
 -- Ensure password hashing available
@@ -273,112 +273,94 @@ CREATE INDEX IF NOT EXISTS idx_notifications_user ON public.notifications(user_i
 CREATE INDEX IF NOT EXISTS idx_notifications_unread ON public.notifications(user_id, is_read) WHERE is_read = false;
 
 -- ============================================================
--- SEED ROLES
+-- SEED ROLES — the 5 portal types
 -- ============================================================
 INSERT INTO public.roles (name, slug, description, hierarchy_level, is_administrative) VALUES
-  ('System Administrator', 'system-admin', 'Full platform administration â€” roles, settings, audit', 1, true),
-  ('HR Manager', 'hr-manager', 'HR administration, employee records, leave approval, people operations', 2, true),
-  ('Manager', 'manager', 'Team oversight â€” attendance and leave approval for direct reports', 3, false),
-  ('Recruiter', 'recruiter', 'Recruitment and candidate pipeline management', 4, false),
-  ('Finance', 'finance', 'Payroll, expenses and financial reporting', 5, true),
-  ('Employee', 'employee', 'Standard staff member â€” self-service portal', 99, false)
+  ('System Administrator', 'system-admin', 'Full platform administration — roles, settings, audit, users', 1, true),
+  ('CEO', 'ceo', 'Chief Executive Officer — full company visibility and decision-making', 2, true),
+  ('Co-Founder', 'co-founder', 'Co-Founder — full company visibility and decision-making', 3, true),
+  ('Administrator', 'administrator', 'Runs HR, operations, finance and company modules (business access, no system keys)', 4, true),
+  ('Staff Member', 'employee', 'Standard staff member — self-service portal', 99, false)
 ON CONFLICT (slug) DO NOTHING;
 
 -- ============================================================
--- SEED ROLE PERMISSIONS (per matrix in lib/hrm/permissions.ts)
+-- SEED ROLE PERMISSIONS (matches lib/hrm/permissions.ts exactly)
 -- ============================================================
--- System Administrator
+-- System Admin / CEO / Co-Founder: ALL permissions
+DO $$
+DECLARE
+  perm text;
+BEGIN
+  FOREACH perm IN ARRAY ARRAY[
+    'employees.view', 'employees.manage',
+    'roles.view', 'roles.assign', 'roles.remove',
+    'candidates.view', 'candidates.review', 'candidates.shortlist', 'candidates.interview', 'candidates.decide',
+    'attendance.view', 'attendance.manage',
+    'leave.view', 'leave.manage', 'leave.approve',
+    'payroll.view', 'payroll.run',
+    'finance.view', 'finance.expenses.create', 'finance.expenses.approve', 'finance.reports.view',
+    'training.view', 'training.manage',
+    'performance.view', 'performance.manage',
+    'documents.view', 'documents.manage',
+    'announcements.view', 'announcements.create', 'announcements.manage',
+    'departments.view', 'departments.manage',
+    'positions.view', 'positions.manage',
+    'projects.view', 'projects.manage',
+    'tasks.view', 'tasks.manage',
+    'work_reports.view', 'work_reports.manage',
+    'payments.view', 'payments.manage',
+    'users.manage',
+    'reports.view',
+    'revenue.view',
+    'partners.view',
+    'audit.view',
+    'settings.manage'
+  ]::text[]
+  LOOP
+    INSERT INTO public.role_permissions (role_id, permission)
+    SELECT r.id, perm FROM public.roles r
+    WHERE r.slug IN ('system-admin', 'ceo', 'co-founder')
+    ON CONFLICT (role_id, permission) DO NOTHING;
+  END LOOP;
+END $$;
+
+-- Administrator: the same business access, minus system-only keys
 INSERT INTO public.role_permissions (role_id, permission)
-SELECT r.id, p.perm FROM public.roles r, (VALUES
-  ('employees.view'), ('employees.manage'),
-  ('roles.view'), ('roles.assign'), ('roles.remove'),
-  ('candidates.view'), ('candidates.review'), ('candidates.shortlist'), ('candidates.interview'), ('candidates.decide'),
-  ('attendance.view'), ('attendance.manage'),
-  ('leave.view'), ('leave.manage'), ('leave.approve'),
-  ('payroll.view'), ('payroll.run'),
-  ('finance.view'), ('finance.expenses.create'), ('finance.expenses.approve'), ('finance.reports.view'),
-  ('training.view'), ('training.manage'),
-  ('performance.view'), ('performance.manage'),
-  ('documents.view'), ('documents.manage'),
-  ('announcements.view'), ('announcements.create'),
-  ('reports.view'),
-  ('audit.view'), ('settings.manage')
-) AS p(perm) WHERE r.slug = 'system-admin'
+SELECT DISTINCT a.id, rp.permission
+FROM public.role_permissions rp
+JOIN public.roles src ON rp.role_id = src.id
+CROSS JOIN public.roles a
+WHERE src.slug = 'system-admin'
+  AND a.slug = 'administrator'
+  AND rp.permission NOT IN ('roles.view', 'roles.assign', 'roles.remove', 'users.manage', 'audit.view', 'settings.manage')
 ON CONFLICT (role_id, permission) DO NOTHING;
 
--- HR Manager
-INSERT INTO public.role_permissions (role_id, permission)
-SELECT r.id, p.perm FROM public.roles r, (VALUES
-  ('employees.view'), ('employees.manage'),
-  ('candidates.view'), ('candidates.review'), ('candidates.shortlist'), ('candidates.interview'), ('candidates.decide'),
-  ('attendance.view'), ('attendance.manage'),
-  ('leave.view'), ('leave.manage'), ('leave.approve'),
-  ('payroll.view'),
-  ('finance.view'),
-  ('training.view'), ('training.manage'),
-  ('performance.view'), ('performance.manage'),
-  ('documents.view'), ('documents.manage'),
-  ('announcements.view'), ('announcements.create'),
-  ('reports.view')
-) AS p(perm) WHERE r.slug = 'hr-manager'
-ON CONFLICT (role_id, permission) DO NOTHING;
-
--- Manager
-INSERT INTO public.role_permissions (role_id, permission)
-SELECT r.id, p.perm FROM public.roles r, (VALUES
-  ('employees.view'),
-  ('attendance.view'), ('attendance.manage'),
-  ('leave.view'), ('leave.approve'),
-  ('performance.view'),
-  ('announcements.view'),
-  ('reports.view')
-) AS p(perm) WHERE r.slug = 'manager'
-ON CONFLICT (role_id, permission) DO NOTHING;
-
--- Recruiter
-INSERT INTO public.role_permissions (role_id, permission)
-SELECT r.id, p.perm FROM public.roles r, (VALUES
-  ('employees.view'),
-  ('candidates.view'), ('candidates.review'), ('candidates.shortlist'), ('candidates.interview'), ('candidates.decide'),
-  ('announcements.view')
-) AS p(perm) WHERE r.slug = 'recruiter'
-ON CONFLICT (role_id, permission) DO NOTHING;
-
--- Finance
-INSERT INTO public.role_permissions (role_id, permission)
-SELECT r.id, p.perm FROM public.roles r, (VALUES
-  ('employees.view'),
-  ('payroll.view'), ('payroll.run'),
-  ('finance.view'), ('finance.expenses.create'), ('finance.expenses.approve'), ('finance.reports.view'),
-  ('documents.view'),
-  ('announcements.view'),
-  ('reports.view')
-) AS p(perm) WHERE r.slug = 'finance'
-ON CONFLICT (role_id, permission) DO NOTHING;
-
--- Employee
+-- Staff Member: self-service
 INSERT INTO public.role_permissions (role_id, permission)
 SELECT r.id, p.perm FROM public.roles r, (VALUES
   ('attendance.view'),
   ('leave.view'),
   ('performance.view'),
   ('documents.view'),
-  ('announcements.view')
+  ('announcements.view'),
+  ('payments.view'),
+  ('tasks.view'),
+  ('work_reports.view')
 ) AS p(perm) WHERE r.slug = 'employee'
 ON CONFLICT (role_id, permission) DO NOTHING;
 
 -- ============================================================
--- SEED DEMO USERS (one login per role)
+-- SEED DEMO USERS (one login per portal type)
 -- Shared password: Demo@1234
 -- ============================================================
--- | role            | email                       | login name           | employee_id |
--- |-----------------|-----------------------------|----------------------|-------------|
--- | system-admin    | samuel540wisesamura@gmail.com | System Administrator | SET-0001    |
--- | hr-manager      | hr@syscendhrm.test          | HR Manager Demo      | SET-0002    |
--- | manager         | manager@syscendhrm.test     | Manager Demo         | SET-0003    |
--- | recruiter       | recruiter@syscendhrm.test   | Recruiter Demo       | SET-0004    |
--- | finance         | finance@syscendhrm.test     | Finance Demo         | SET-0005    |
--- | employee        | employee@syscendhrm.test    | Employee Demo        | SET-0006    |
+-- | portal type          | email                       | login name           | employee_id |
+-- |----------------------|-----------------------------|----------------------|-------------|
+-- | system-admin         | samuel540wisesamura@gmail.com | System Administrator | SET-0001    |
+-- | administrator        | hr@syscendhrm.test          | Administrator Demo   | SET-0002    |
+-- | co-founder           | manager@syscendhrm.test     | Co-Founder Demo      | SET-0003    |
+-- | ceo                  | recruiter@syscendhrm.test   | CEO Demo             | SET-0004    |
+-- | employee             | finance@syscendhrm.test     | Staff Member Demo    | SET-0005    |
+-- | employee             | employee@syscendhrm.test    | Staff Member Demo    | SET-0006    |
 
 -- Shared demo password: Demo@1234
 -- System Admin (owner) uses a separate temporary password: SamuraT3mp-2026!
@@ -391,11 +373,11 @@ DECLARE
 BEGIN
   FOR u IN SELECT * FROM (VALUES
     ('system-admin', 'samuel540wisesamura@gmail.com', 'System Administrator', 'SET-0001', 'SamuraT3mp-2026!'),
-    ('hr-manager', 'hr@syscendhrm.test', 'HR Manager Demo', 'SET-0002', 'Demo@1234'),
-    ('manager', 'manager@syscendhrm.test', 'Manager Demo', 'SET-0003', 'Demo@1234'),
-    ('recruiter', 'recruiter@syscendhrm.test', 'Recruiter Demo', 'SET-0004', 'Demo@1234'),
-    ('finance', 'finance@syscendhrm.test', 'Finance Demo', 'SET-0005', 'Demo@1234'),
-    ('employee', 'employee@syscendhrm.test', 'Employee Demo', 'SET-0006', 'Demo@1234')
+    ('administrator', 'hr@syscendhrm.test', 'Administrator Demo', 'SET-0002', 'Demo@1234'),
+    ('co-founder', 'manager@syscendhrm.test', 'Co-Founder Demo', 'SET-0003', 'Demo@1234'),
+    ('ceo', 'recruiter@syscendhrm.test', 'CEO Demo', 'SET-0004', 'Demo@1234'),
+    ('employee', 'finance@syscendhrm.test', 'Staff Member Demo', 'SET-0005', 'Demo@1234'),
+    ('employee', 'employee@syscendhrm.test', 'Staff Member Demo', 'SET-0006', 'Demo@1234')
   ) AS d(role_slug, email, display_name, employee_id, seed_password)
   LOOP
     CONTINUE WHEN EXISTS (SELECT 1 FROM auth.users au WHERE au.email = u.email);
@@ -441,12 +423,10 @@ BEGIN
 END $$;
 
 select 'Sierra Electric HRM base schema seeded. Demo password for all seeded users: Demo@1234' as status;
-
-
 -- >>>>>>>>>> FILE: 002_seed_staff.sql <<<<<<<<<<
 
 -- ============================================================
--- Sierra Electric Technologies HRM â€” Seed staff roster
+-- Sierra Electric Technologies HRM — Seed staff roster
 -- Run AFTER 001_base_roles_demo.sql. Idempotent.
 --
 --   * Gives the 6 seeded demo accounts realistic positions/departments
@@ -549,12 +529,10 @@ BEGIN
 END $$;
 
 select 'Sierra Electric HRM staff roster seeded (20 staff, 6 role accounts).' as status;
-
-
 -- >>>>>>>>>> FILE: 003_leave.sql <<<<<<<<<<
 
 -- ============================================================
--- Sierra Electric Technologies HRM â€” Leave management
+-- Sierra Electric Technologies HRM — Leave management
 -- Run AFTER 001_base_roles_demo.sql and 002_seed_staff.sql.
 -- Idempotent.
 -- ============================================================
@@ -659,13 +637,11 @@ BEGIN
   END LOOP;
 END $$;
 
-select 'Leave module ready â€” leave_types seeded, sample requests added.' as status;
-
-
+select 'Leave module ready — leave_types seeded, sample requests added.' as status;
 -- >>>>>>>>>> FILE: 004_attendance.sql <<<<<<<<<<
 
 -- ============================================================
--- Sierra Electric Technologies HRM â€” Attendance
+-- Sierra Electric Technologies HRM — Attendance
 -- Run AFTER 001-003. Idempotent.
 -- ============================================================
 
@@ -738,13 +714,11 @@ BEGIN
   END LOOP;
 END $$;
 
-select 'Attendance module ready â€” past 5 workdays seeded.' as status;
-
-
+select 'Attendance module ready — past 5 workdays seeded.' as status;
 -- >>>>>>>>>> FILE: 005_candidates.sql <<<<<<<<<<
 
 -- ============================================================
--- Sierra Electric Technologies HRM â€” Candidates / Recruitment
+-- Sierra Electric Technologies HRM — Candidates / Recruitment
 -- Run AFTER 001-004. Idempotent.
 -- ============================================================
 
@@ -803,13 +777,11 @@ INSERT INTO public.candidates (display_name, email, phone, position_applied, sou
   ('Rugiatu Kanu',     'rugiatu.kanu@example.com',     '232 76 311 458', 'HR Officer',                'media',     'shortlisted', now() - interval '1 day')
 ON CONFLICT (email) DO NOTHING;
 
-select 'Candidates module ready â€” 8 seeded applications.' as status;
-
-
+select 'Candidates module ready — 8 seeded applications.' as status;
 -- >>>>>>>>>> FILE: 006_payroll.sql <<<<<<<<<<
 
 -- ============================================================
--- Sierra Electric Technologies HRM â€” Payroll
+-- Sierra Electric Technologies HRM — Payroll
 -- Run AFTER 001-005. Idempotent.
 -- ============================================================
 
@@ -932,13 +904,11 @@ BEGIN
   END IF;
 END $$;
 
-select 'Payroll module ready â€” salary configs + current month run seeded.' as status;
-
-
+select 'Payroll module ready — salary configs + current month run seeded.' as status;
 -- >>>>>>>>>> FILE: 007_admin_analytics.sql <<<<<<<<<<
 
 -- ============================================================
--- 007 â€” ADMIN ANALYTICS
+-- 007 — ADMIN ANALYTICS
 -- Revenue tracking + partner gigs (inquiries from partners)
 -- Powers the admin dashboard cards (total revenue, revenue this
 -- month, partner gigs / quick updates) and future admin panels.
@@ -1008,11 +978,11 @@ WHERE r.slug = 'system-admin'
 ON CONFLICT (role_id, permission) DO NOTHING;
 
 INSERT INTO public.role_permissions (role_id, permission)
-SELECT r.id, 'revenue.view' FROM public.roles r WHERE r.slug = 'finance'
+SELECT r.id, 'revenue.view' FROM public.roles r WHERE r.slug IN ('administrator', 'ceo', 'co-founder')
 ON CONFLICT (role_id, permission) DO NOTHING;
 
 INSERT INTO public.role_permissions (role_id, permission)
-SELECT r.id, 'partners.view' FROM public.roles r WHERE r.slug = 'hr-manager'
+SELECT r.id, 'partners.view' FROM public.roles r WHERE r.slug IN ('administrator', 'ceo', 'co-founder')
 ON CONFLICT (role_id, permission) DO NOTHING;
 
 -- ------------------------------------------------------------------
@@ -1040,12 +1010,10 @@ SELECT * FROM (VALUES
   ('SierraNet Fibre', 'Patricia Williams', 'p.williams@sierranet.sl', '+232 76 111 006', 'Backbone power redundancy', 'Power redundancy design for national fibre backbone POPs.', 11750000, 'SLL', 'lost', now() - interval '9 days')
 ) AS v(company_name, contact_name, contact_email, contact_phone, gig_title, description, expected_value, currency, status, created_at)
 WHERE NOT EXISTS (SELECT 1 FROM public.partner_inquiries);
-
-
 -- >>>>>>>>>> FILE: 008_staff_operations.sql <<<<<<<<<<
 
 -- ============================================================
--- 008 â€” STAFF & OPERATIONS (Samuel's portal core)
+-- 008 — STAFF & OPERATIONS (Samuel's portal core)
 -- Departments, Positions, Projects, Tasks, Work Reports, Payments
 -- + new action-based permissions. Idempotent; safe to re-run.
 -- ============================================================
@@ -1274,13 +1242,13 @@ INSERT INTO public.role_permissions (role_id, permission)
 SELECT r.id, p.perm FROM public.roles r, (VALUES
   ('departments.view'), ('positions.view'), ('projects.view'), ('tasks.view'),
   ('work_reports.view'), ('payments.view'), ('announcements.manage')
-) AS p(perm) WHERE r.slug = 'hr-manager'
+) AS p(perm) WHERE r.slug = 'administrator'
 ON CONFLICT (role_id, permission) DO NOTHING;
 
 INSERT INTO public.role_permissions (role_id, permission)
 SELECT r.id, p.perm FROM public.roles r, (VALUES
   ('projects.view'), ('tasks.view'), ('work_reports.view'), ('payments.view'), ('announcements.manage')
-) AS p(perm) WHERE r.slug = 'manager'
+) AS p(perm) WHERE r.slug = 'co-founder'
 ON CONFLICT (role_id, permission) DO NOTHING;
 
 INSERT INTO public.role_permissions (role_id, permission)
@@ -1311,48 +1279,15 @@ FROM (VALUES
 ) AS v(name, slug, description, head_employee_id)
 WHERE NOT EXISTS (SELECT 1 FROM public.departments);
 
-INSERT INTO public.positions (name, slug, description, responsibilities, department_id)
-SELECT v.name, v.slug, v.description, v.responsibilities,
-  (SELECT id FROM public.departments d WHERE d.slug = v.dept_slug)
-FROM (VALUES
-  ('Administrator', 'administrator', 'Company administration and operational oversight.', 'Coordinate operations, review approvals, manage company-wide activity.', 'head-office'),
-  ('System Administrator', 'system-administrator', 'Owner of the company systems and access.', 'Manage users, roles, permissions, audit log and system settings.', 'head-office'),
-  ('Software Engineer', 'software-engineer', 'Builds and maintains company software and platforms.', 'Develop features, fix bugs, ship releases and support internal tools.', 'engineering'),
-  ('Electrical Engineer', 'electrical-engineer', 'Electrical design and project engineering.', 'Design systems, supervise installations, ensure quality and safety.', 'engineering'),
-  ('Engineering Lead', 'engineering-lead', 'Leads engineering delivery teams.', 'Own technical delivery, review designs and mentor the team.', 'engineering'),
-  ('Media Officer', 'media-officer', 'Company communications and media.', 'Produce content, manage channels and support stakeholder communications.', 'head-office'),
-  ('Project Engineer', 'project-engineer', 'Engineers assigned to specific projects.', 'Deliver project engineering tasks on schedule and budget.', 'engineering'),
-  ('Systems Administrator', 'systems-administrator', 'Maintains IT infrastructure and systems.', 'Manage servers, networks and internal platforms.', 'engineering'),
-  ('Finance Manager', 'finance-manager', 'Owns financial planning and control.', 'Oversee payments, expenses, cash flow and financial reports.', 'finance'),
-  ('HR Officer', 'hr-officer', 'Supports people operations.', 'Maintain staff records, leave and payroll inputs.', 'human-resources'),
-  ('Accounts Officer', 'accounts-officer', 'Processes financial transactions.', 'Record payments, reconcile accounts and support month-end.', 'finance'),
-  ('Site Supervisor', 'site-supervisor', 'Supervises field work at sites.', 'Coordinate crews, enforce safety and report progress.', 'field-services'),
-  ('Sales Executive', 'sales-executive', 'Sells company products and services.', 'Win new business and grow existing accounts.', 'sales'),
-  ('Field Technician', 'field-technician', 'Installs and services equipment in the field.', 'Carry out installs, checks and repairs on site.', 'field-services')
-) AS v(name, slug, description, responsibilities, dept_slug)
-WHERE NOT EXISTS (SELECT 1 FROM public.positions);
-
--- Personalise the owner account
+-- Personalise the owner account (display name only — no position assigned yet)
 UPDATE public.profiles
-SET display_name = 'Samuel Samura',
-    position = 'Administrator'
+SET display_name = 'Samuel Samura'
 WHERE email = 'samuel540wisesamura@gmail.com';
 
--- Link Samuel's three positions
-INSERT INTO public.profile_positions (profile_id, position_id)
-SELECT p.id, pos.id
-FROM public.profiles p
-JOIN public.positions pos ON pos.slug IN ('administrator', 'system-administrator', 'software-engineer')
-WHERE p.email = 'samuel540wisesamura@gmail.com'
-ON CONFLICT (profile_id, position_id) DO NOTHING;
-
--- Link remaining staff to positions by matching their profile position text
-INSERT INTO public.profile_positions (profile_id, position_id)
-SELECT p.id, pos.id
-FROM public.profiles p
-JOIN public.positions pos ON lower(pos.name) = lower(p.position)
-WHERE p.position IS NOT NULL AND p.position <> ''
-ON CONFLICT (profile_id, position_id) DO NOTHING;
+-- NOTE: job positions and profile↔position assignments are intentionally NOT
+-- seeded yet. The positions / profile_positions tables are ready for them —
+-- positions and responsibilities will be provided later and assigned to
+-- existing portal types (no new portal types required).
 
 -- Projects
 INSERT INTO public.projects (name, description, lead_id, department_id, status, priority, start_date, target_date, progress)
@@ -1471,4 +1406,174 @@ FROM (VALUES
 ) AS v(title, body, audience, priority, is_pinned, days_ago)
 WHERE NOT EXISTS (SELECT 1 FROM public.announcements);
 
-select 'Staff & Operations schema seeded (departments, positions, projects, tasks, work reports, payments)' as status;
+select 'Staff & Operations schema seeded (departments, projects, tasks, work reports, payments, announcements). Positions left for later assignment.' as status;
+-- >>>>>>>>>> FILE: 009_portal_types.sql <<<<<<<<<<
+
+-- ============================================================
+-- 009 — THE 5 PORTAL TYPES (System Administrator, CEO, Co-Founder,
+--       Administrator, Staff Member)
+--
+-- Transforms an existing database (which may already have the legacy
+-- roles: hr-manager, manager, recruiter, finance, employee) into the
+-- single-source 5-portal-type matrix. Idempotent — safe to re-run.
+--
+--   * Always runs: ensures the 5 roles exist, renames people-facing
+--     labels, and rebuilds each of the 5 roles' permissions to match
+--     lib/hrm/permissions.ts exactly.
+--   * Runs once (only when legacy roles still exist): re-seats existing
+--     assignments onto the new portal types, updates demo display
+--     names, deletes the legacy roles, and clears the demo job
+--     positions (positions will be provided and assigned later).
+-- ============================================================
+
+-- ------------------------------------------------------------------
+-- 1) ENSURE THE 5 ROLES EXIST
+-- ------------------------------------------------------------------
+INSERT INTO public.roles (name, slug, description, hierarchy_level, is_administrative) VALUES
+  ('CEO', 'ceo', 'Chief Executive Officer — full company visibility and decision-making', 2, true),
+  ('Co-Founder', 'co-founder', 'Co-Founder — full company visibility and decision-making', 3, true),
+  ('Administrator', 'administrator', 'Runs HR, operations, finance and company modules (business access, no system keys)', 4, true)
+ON CONFLICT (slug) DO NOTHING;
+
+UPDATE public.roles
+SET hierarchy_level = 1, is_administrative = true
+WHERE slug = 'system-admin';
+
+UPDATE public.roles
+SET name = 'Staff Member', hierarchy_level = 99, is_administrative = false
+WHERE slug = 'employee' AND name <> 'Staff Member';
+
+UPDATE public.roles
+SET is_administrative = true
+WHERE slug IN ('ceo', 'co-founder', 'administrator');
+
+-- ------------------------------------------------------------------
+-- 2) REBUILD PERMISSION GRANTS FOR THE 5 ROLES (exact parity)
+-- ------------------------------------------------------------------
+DELETE FROM public.role_permissions
+WHERE role_id IN (SELECT id FROM public.roles WHERE slug IN ('system-admin', 'ceo', 'co-founder', 'administrator', 'employee'));
+
+-- System Admin / CEO / Co-Founder: ALL permissions
+DO $$
+DECLARE
+  perm text;
+BEGIN
+  FOREACH perm IN ARRAY ARRAY[
+    'employees.view', 'employees.manage',
+    'roles.view', 'roles.assign', 'roles.remove',
+    'candidates.view', 'candidates.review', 'candidates.shortlist', 'candidates.interview', 'candidates.decide',
+    'attendance.view', 'attendance.manage',
+    'leave.view', 'leave.manage', 'leave.approve',
+    'payroll.view', 'payroll.run',
+    'finance.view', 'finance.expenses.create', 'finance.expenses.approve', 'finance.reports.view',
+    'training.view', 'training.manage',
+    'performance.view', 'performance.manage',
+    'documents.view', 'documents.manage',
+    'announcements.view', 'announcements.create', 'announcements.manage',
+    'departments.view', 'departments.manage',
+    'positions.view', 'positions.manage',
+    'projects.view', 'projects.manage',
+    'tasks.view', 'tasks.manage',
+    'work_reports.view', 'work_reports.manage',
+    'payments.view', 'payments.manage',
+    'users.manage',
+    'reports.view',
+    'revenue.view',
+    'partners.view',
+    'audit.view',
+    'settings.manage'
+  ]::text[]
+  LOOP
+    INSERT INTO public.role_permissions (role_id, permission)
+    SELECT r.id, perm FROM public.roles r
+    WHERE r.slug IN ('system-admin', 'ceo', 'co-founder')
+    ON CONFLICT (role_id, permission) DO NOTHING;
+  END LOOP;
+END $$;
+
+-- Administrator: the same business access, minus system-only keys
+INSERT INTO public.role_permissions (role_id, permission)
+SELECT DISTINCT a.id, rp.permission
+FROM public.role_permissions rp
+JOIN public.roles src ON rp.role_id = src.id
+CROSS JOIN public.roles a
+WHERE src.slug = 'system-admin'
+  AND a.slug = 'administrator'
+  AND rp.permission NOT IN ('roles.view', 'roles.assign', 'roles.remove', 'users.manage', 'audit.view', 'settings.manage')
+ON CONFLICT (role_id, permission) DO NOTHING;
+
+-- Staff Member: self-service
+INSERT INTO public.role_permissions (role_id, permission)
+SELECT r.id, p.perm FROM public.roles r, (VALUES
+  ('attendance.view'),
+  ('leave.view'),
+  ('performance.view'),
+  ('documents.view'),
+  ('announcements.view'),
+  ('payments.view'),
+  ('tasks.view'),
+  ('work_reports.view')
+) AS p(perm) WHERE r.slug = 'employee'
+ON CONFLICT (role_id, permission) DO NOTHING;
+
+-- ------------------------------------------------------------------
+-- 3) ONE-TIME TRANSFORM (legacy schemas only)
+--    Re-seat assignments, refresh demo profiles, remove legacy roles,
+--    and clear the demo job positions for later assignment.
+-- ------------------------------------------------------------------
+DO $$
+DECLARE
+  m     record;
+  v_old uuid;
+  v_new uuid;
+BEGIN
+  -- Legacy schemas only (the old roles were never created on fresh installs)
+  IF NOT EXISTS (SELECT 1 FROM public.roles WHERE slug = 'hr-manager') THEN
+    RETURN;
+  END IF;
+
+  -- Move active assignments from the legacy roles on to the new portal types
+  FOR m IN SELECT * FROM (VALUES
+    ('hr-manager', 'administrator'),
+    ('manager', 'co-founder'),
+    ('recruiter', 'ceo'),
+    ('finance', 'employee')
+  ) AS x(old_slug, new_slug)
+  LOOP
+    SELECT id INTO v_old FROM public.roles WHERE slug = m.old_slug AND is_active = true;
+    SELECT id INTO v_new FROM public.roles WHERE slug = m.new_slug;
+    CONTINUE WHEN v_old IS NULL OR v_new IS NULL;
+
+    UPDATE public.user_roles
+    SET role_id = v_new, updated_at = now()
+    WHERE role_id = v_old
+      AND NOT EXISTS (
+        SELECT 1 FROM public.user_roles dup
+        WHERE dup.user_id = public.user_roles.user_id AND dup.role_id = v_new
+      );
+  END LOOP;
+
+  -- Refresh the demo accounts' portal display names
+  UPDATE public.profiles p
+  SET display_name = d.display_name
+  FROM (VALUES
+    ('hr@syscendhrm.test', 'Administrator Demo'),
+    ('manager@syscendhrm.test', 'Co-Founder Demo'),
+    ('recruiter@syscendhrm.test', 'CEO Demo'),
+    ('finance@syscendhrm.test', 'Staff Member Demo'),
+    ('employee@syscendhrm.test', 'Staff Member Demo')
+  ) AS d(email, display_name)
+  WHERE p.email = d.email;
+
+  -- Remove the legacy portal types (their assignments were moved above)
+  DELETE FROM public.roles
+  WHERE slug IN ('hr-manager', 'manager', 'recruiter', 'finance');
+
+  -- Clear the demo job positions — positions & responsibilities will be
+  -- provided later and assigned to these portal types (no new types needed)
+  DELETE FROM public.profile_positions;
+  DELETE FROM public.positions;
+  UPDATE public.profiles SET position = NULL;
+END $$;
+
+select 'Portal types migrated: System Administrator, CEO, Co-Founder, Administrator, Staff Member.' as status;

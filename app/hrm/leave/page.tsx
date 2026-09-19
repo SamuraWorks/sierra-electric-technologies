@@ -43,9 +43,7 @@ export default async function LeavePage({
     .select('*, user:user_id(display_name, email, employee_id, position), leave_type:leave_type_id(name, slug)')
     .order('created_at', { ascending: false })
 
-  const isPeopleOps = ctx.roleSlugs.some((s) =>
-    ['hr-manager', 'manager', 'system-admin'].includes(s),
-  )
+  const isPeopleOps = hasPermission(ctx, 'leave.approve') || ctx.roleSlugs.includes('system-admin')
   if (!isPeopleOps) {
     query = query.eq('user_id', ctx.userId)
   }

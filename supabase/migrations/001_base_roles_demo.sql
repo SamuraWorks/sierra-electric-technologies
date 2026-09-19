@@ -6,9 +6,9 @@
 --   * profiles (extends auth.users)
 --   * roles, role_permissions, user_roles (RBAC)
 --   * helper SQL functions (user_has_permission, user_role_slugs, etc.)
---   * 6 roles with permission matrix (Admin, HR Manager, Manager,
---     Recruiter, Finance, Employee)
---   * 6 demo users, one per role (shared password: Demo@1234)
+--   * the 5 portal types: System Administrator, CEO, Co-Founder,
+--     Administrator, Staff Member
+--   * 6 demo users (one per portal type, two staff demos); shared password: Demo@1234
 -- ============================================================
 
 -- Ensure password hashing available
@@ -269,112 +269,94 @@ CREATE INDEX IF NOT EXISTS idx_notifications_user ON public.notifications(user_i
 CREATE INDEX IF NOT EXISTS idx_notifications_unread ON public.notifications(user_id, is_read) WHERE is_read = false;
 
 -- ============================================================
--- SEED ROLES
+-- SEED ROLES — the 5 portal types
 -- ============================================================
 INSERT INTO public.roles (name, slug, description, hierarchy_level, is_administrative) VALUES
-  ('System Administrator', 'system-admin', 'Full platform administration — roles, settings, audit', 1, true),
-  ('HR Manager', 'hr-manager', 'HR administration, employee records, leave approval, people operations', 2, true),
-  ('Manager', 'manager', 'Team oversight — attendance and leave approval for direct reports', 3, false),
-  ('Recruiter', 'recruiter', 'Recruitment and candidate pipeline management', 4, false),
-  ('Finance', 'finance', 'Payroll, expenses and financial reporting', 5, true),
-  ('Employee', 'employee', 'Standard staff member — self-service portal', 99, false)
+  ('System Administrator', 'system-admin', 'Full platform administration — roles, settings, audit, users', 1, true),
+  ('CEO', 'ceo', 'Chief Executive Officer — full company visibility and decision-making', 2, true),
+  ('Co-Founder', 'co-founder', 'Co-Founder — full company visibility and decision-making', 3, true),
+  ('Administrator', 'administrator', 'Runs HR, operations, finance and company modules (business access, no system keys)', 4, true),
+  ('Staff Member', 'employee', 'Standard staff member — self-service portal', 99, false)
 ON CONFLICT (slug) DO NOTHING;
 
 -- ============================================================
--- SEED ROLE PERMISSIONS (per matrix in lib/hrm/permissions.ts)
+-- SEED ROLE PERMISSIONS (matches lib/hrm/permissions.ts exactly)
 -- ============================================================
--- System Administrator
+-- System Admin / CEO / Co-Founder: ALL permissions
+DO $$
+DECLARE
+  perm text;
+BEGIN
+  FOREACH perm IN ARRAY ARRAY[
+    'employees.view', 'employees.manage',
+    'roles.view', 'roles.assign', 'roles.remove',
+    'candidates.view', 'candidates.review', 'candidates.shortlist', 'candidates.interview', 'candidates.decide',
+    'attendance.view', 'attendance.manage',
+    'leave.view', 'leave.manage', 'leave.approve',
+    'payroll.view', 'payroll.run',
+    'finance.view', 'finance.expenses.create', 'finance.expenses.approve', 'finance.reports.view',
+    'training.view', 'training.manage',
+    'performance.view', 'performance.manage',
+    'documents.view', 'documents.manage',
+    'announcements.view', 'announcements.create', 'announcements.manage',
+    'departments.view', 'departments.manage',
+    'positions.view', 'positions.manage',
+    'projects.view', 'projects.manage',
+    'tasks.view', 'tasks.manage',
+    'work_reports.view', 'work_reports.manage',
+    'payments.view', 'payments.manage',
+    'users.manage',
+    'reports.view',
+    'revenue.view',
+    'partners.view',
+    'audit.view',
+    'settings.manage'
+  ]::text[]
+  LOOP
+    INSERT INTO public.role_permissions (role_id, permission)
+    SELECT r.id, perm FROM public.roles r
+    WHERE r.slug IN ('system-admin', 'ceo', 'co-founder')
+    ON CONFLICT (role_id, permission) DO NOTHING;
+  END LOOP;
+END $$;
+
+-- Administrator: the same business access, minus system-only keys
 INSERT INTO public.role_permissions (role_id, permission)
-SELECT r.id, p.perm FROM public.roles r, (VALUES
-  ('employees.view'), ('employees.manage'),
-  ('roles.view'), ('roles.assign'), ('roles.remove'),
-  ('candidates.view'), ('candidates.review'), ('candidates.shortlist'), ('candidates.interview'), ('candidates.decide'),
-  ('attendance.view'), ('attendance.manage'),
-  ('leave.view'), ('leave.manage'), ('leave.approve'),
-  ('payroll.view'), ('payroll.run'),
-  ('finance.view'), ('finance.expenses.create'), ('finance.expenses.approve'), ('finance.reports.view'),
-  ('training.view'), ('training.manage'),
-  ('performance.view'), ('performance.manage'),
-  ('documents.view'), ('documents.manage'),
-  ('announcements.view'), ('announcements.create'),
-  ('reports.view'),
-  ('audit.view'), ('settings.manage')
-) AS p(perm) WHERE r.slug = 'system-admin'
+SELECT DISTINCT a.id, rp.permission
+FROM public.role_permissions rp
+JOIN public.roles src ON rp.role_id = src.id
+CROSS JOIN public.roles a
+WHERE src.slug = 'system-admin'
+  AND a.slug = 'administrator'
+  AND rp.permission NOT IN ('roles.view', 'roles.assign', 'roles.remove', 'users.manage', 'audit.view', 'settings.manage')
 ON CONFLICT (role_id, permission) DO NOTHING;
 
--- HR Manager
-INSERT INTO public.role_permissions (role_id, permission)
-SELECT r.id, p.perm FROM public.roles r, (VALUES
-  ('employees.view'), ('employees.manage'),
-  ('candidates.view'), ('candidates.review'), ('candidates.shortlist'), ('candidates.interview'), ('candidates.decide'),
-  ('attendance.view'), ('attendance.manage'),
-  ('leave.view'), ('leave.manage'), ('leave.approve'),
-  ('payroll.view'),
-  ('finance.view'),
-  ('training.view'), ('training.manage'),
-  ('performance.view'), ('performance.manage'),
-  ('documents.view'), ('documents.manage'),
-  ('announcements.view'), ('announcements.create'),
-  ('reports.view')
-) AS p(perm) WHERE r.slug = 'hr-manager'
-ON CONFLICT (role_id, permission) DO NOTHING;
-
--- Manager
-INSERT INTO public.role_permissions (role_id, permission)
-SELECT r.id, p.perm FROM public.roles r, (VALUES
-  ('employees.view'),
-  ('attendance.view'), ('attendance.manage'),
-  ('leave.view'), ('leave.approve'),
-  ('performance.view'),
-  ('announcements.view'),
-  ('reports.view')
-) AS p(perm) WHERE r.slug = 'manager'
-ON CONFLICT (role_id, permission) DO NOTHING;
-
--- Recruiter
-INSERT INTO public.role_permissions (role_id, permission)
-SELECT r.id, p.perm FROM public.roles r, (VALUES
-  ('employees.view'),
-  ('candidates.view'), ('candidates.review'), ('candidates.shortlist'), ('candidates.interview'), ('candidates.decide'),
-  ('announcements.view')
-) AS p(perm) WHERE r.slug = 'recruiter'
-ON CONFLICT (role_id, permission) DO NOTHING;
-
--- Finance
-INSERT INTO public.role_permissions (role_id, permission)
-SELECT r.id, p.perm FROM public.roles r, (VALUES
-  ('employees.view'),
-  ('payroll.view'), ('payroll.run'),
-  ('finance.view'), ('finance.expenses.create'), ('finance.expenses.approve'), ('finance.reports.view'),
-  ('documents.view'),
-  ('announcements.view'),
-  ('reports.view')
-) AS p(perm) WHERE r.slug = 'finance'
-ON CONFLICT (role_id, permission) DO NOTHING;
-
--- Employee
+-- Staff Member: self-service
 INSERT INTO public.role_permissions (role_id, permission)
 SELECT r.id, p.perm FROM public.roles r, (VALUES
   ('attendance.view'),
   ('leave.view'),
   ('performance.view'),
   ('documents.view'),
-  ('announcements.view')
+  ('announcements.view'),
+  ('payments.view'),
+  ('tasks.view'),
+  ('work_reports.view')
 ) AS p(perm) WHERE r.slug = 'employee'
 ON CONFLICT (role_id, permission) DO NOTHING;
 
 -- ============================================================
--- SEED DEMO USERS (one login per role)
+-- SEED DEMO USERS (one login per portal type)
 -- Shared password: Demo@1234
 -- ============================================================
--- | role            | email                       | login name           | employee_id |
--- |-----------------|-----------------------------|----------------------|-------------|
--- | system-admin    | samuel540wisesamura@gmail.com | System Administrator | SET-0001    |
--- | hr-manager      | hr@syscendhrm.test          | HR Manager Demo      | SET-0002    |
--- | manager         | manager@syscendhrm.test     | Manager Demo         | SET-0003    |
--- | recruiter       | recruiter@syscendhrm.test   | Recruiter Demo       | SET-0004    |
--- | finance         | finance@syscendhrm.test     | Finance Demo         | SET-0005    |
--- | employee        | employee@syscendhrm.test    | Employee Demo        | SET-0006    |
+-- | portal type          | email                       | login name           | employee_id |
+-- |----------------------|-----------------------------|----------------------|-------------|
+-- | system-admin         | samuel540wisesamura@gmail.com | System Administrator | SET-0001    |
+-- | administrator        | hr@syscendhrm.test          | Administrator Demo   | SET-0002    |
+-- | co-founder           | manager@syscendhrm.test     | Co-Founder Demo      | SET-0003    |
+-- | ceo                  | recruiter@syscendhrm.test   | CEO Demo             | SET-0004    |
+-- | employee             | finance@syscendhrm.test     | Staff Member Demo    | SET-0005    |
+-- | employee             | employee@syscendhrm.test    | Staff Member Demo    | SET-0006    |
 
 -- Shared demo password: Demo@1234
 -- System Admin (owner) uses a separate temporary password: SamuraT3mp-2026!
@@ -387,11 +369,11 @@ DECLARE
 BEGIN
   FOR u IN SELECT * FROM (VALUES
     ('system-admin', 'samuel540wisesamura@gmail.com', 'System Administrator', 'SET-0001', 'SamuraT3mp-2026!'),
-    ('hr-manager', 'hr@syscendhrm.test', 'HR Manager Demo', 'SET-0002', 'Demo@1234'),
-    ('manager', 'manager@syscendhrm.test', 'Manager Demo', 'SET-0003', 'Demo@1234'),
-    ('recruiter', 'recruiter@syscendhrm.test', 'Recruiter Demo', 'SET-0004', 'Demo@1234'),
-    ('finance', 'finance@syscendhrm.test', 'Finance Demo', 'SET-0005', 'Demo@1234'),
-    ('employee', 'employee@syscendhrm.test', 'Employee Demo', 'SET-0006', 'Demo@1234')
+    ('administrator', 'hr@syscendhrm.test', 'Administrator Demo', 'SET-0002', 'Demo@1234'),
+    ('co-founder', 'manager@syscendhrm.test', 'Co-Founder Demo', 'SET-0003', 'Demo@1234'),
+    ('ceo', 'recruiter@syscendhrm.test', 'CEO Demo', 'SET-0004', 'Demo@1234'),
+    ('employee', 'finance@syscendhrm.test', 'Staff Member Demo', 'SET-0005', 'Demo@1234'),
+    ('employee', 'employee@syscendhrm.test', 'Staff Member Demo', 'SET-0006', 'Demo@1234')
   ) AS d(role_slug, email, display_name, employee_id, seed_password)
   LOOP
     CONTINUE WHEN EXISTS (SELECT 1 FROM auth.users au WHERE au.email = u.email);

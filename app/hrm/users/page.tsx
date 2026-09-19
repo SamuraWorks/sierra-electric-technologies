@@ -8,10 +8,9 @@ export const metadata = { title: 'Users' }
 
 const ROLE_BADGE: Record<string, string> = {
   'system-admin': 'bg-blue-600 text-white',
-  'hr-manager': 'bg-indigo-50 text-indigo-700',
-  manager: 'bg-violet-50 text-violet-700',
-  recruiter: 'bg-amber-50 text-amber-700',
-  finance: 'bg-emerald-50 text-emerald-700',
+  ceo: 'bg-violet-700 text-white',
+  'co-founder': 'bg-indigo-600 text-white',
+  administrator: 'bg-amber-500 text-white',
   employee: 'bg-slate-100 text-slate-600',
 }
 
