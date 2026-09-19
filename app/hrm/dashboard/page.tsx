@@ -7,6 +7,7 @@ import {
   CalendarClock,
   CheckCircle2,
   ClipboardList,
+  Clock3,
   FolderKanban,
   ListTodo,
   Megaphone,
@@ -16,6 +17,7 @@ import {
 } from 'lucide-react'
 import { getAuthContext, hasPermission } from '@/lib/hrm/auth'
 import { createClient } from '@/lib/supabase/server'
+import { ClockControl } from '@/components/hrm/clock-control'
 
 export const metadata = { title: 'Dashboard' }
 
@@ -80,6 +82,9 @@ export default async function DashboardPage() {
     revenueRes,
     auditRes,
     notificationsRes,
+    ownAttRes,
+    teamAttRes,
+    teamStaffRes,
   ] = await Promise.all([
     supabase.from('projects').select('id,name,status,priority,progress,target_date').eq('lead_id', userId),
     supabase.from('project_team').select('project:project_id(id,name,status,priority,progress,target_date)').eq('profile_id', userId),
@@ -106,6 +111,13 @@ export default async function DashboardPage() {
       ? supabase.from('audit_logs').select('action,target_type,created_at').order('created_at', { ascending: false }).limit(8)
       : Promise.resolve(null),
     supabase.from('notifications').select('id,title,message,link,is_read,created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(6),
+    supabase.from('attendance_records').select('clock_in, clock_out, note').eq('user_id', userId).eq('date', today).maybeSingle(),
+    can('attendance.manage')
+      ? supabase.from('attendance_records').select('user_id, clock_in, clock_out').eq('date', today)
+      : Promise.resolve({ data: [] }),
+    can('attendance.manage')
+      ? supabase.from('profiles').select('id, display_name, employee_id').neq('employee_id', null)
+      : Promise.resolve({ data: [] }),
   ])
 
   const projectMap = new Map<string, { id: string; name: string; status: string; priority: string; progress: number; target_date: string | null }>()
@@ -194,6 +206,16 @@ export default async function DashboardPage() {
   }))
   const notifications = notificationsRes.data ?? []
 
+  const ownAtt = ownAttRes.data as { clock_in: string | null; clock_out: string | null; note: string | null } | null
+
+  const isPeopleOps = can('attendance.manage')
+  const teamRows = (teamAttRes.data ?? []) as Array<{ user_id: string; clock_in: string | null; clock_out: string | null }>
+  const teamStaff = (teamStaffRes.data ?? []) as Array<{ id: string; display_name: string | null; employee_id: string | null }>
+  const teamRecordByUser = new Map(teamRows.map((r) => [r.user_id, r]))
+  const inNow = teamRows.filter((r) => r.clock_in && !r.clock_out).length
+  const signedOut = teamRows.filter((r) => r.clock_out).length
+  const notIn = teamStaff.length === 0 ? 0 : teamStaff.length - teamRows.length
+
   const snapshot = [
     { label: 'Active staff', value: String(staffCount), icon: Users, show: can('employees.view') },
     { label: 'Departments', value: String(deptCount), icon: Building2, show: can('departments.view') },
@@ -211,6 +233,70 @@ export default async function DashboardPage() {
         <p className="mt-1.5 text-sm text-slate-500">
           Here&apos;s what&apos;s happening across Sierra Electric today.
         </p>
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <div className="mb-3 flex items-center justify-between px-1">
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+              <Clock3 size={16} className="text-blue-600" /> Attendance
+            </h2>
+            <Link href="/hrm/attendance" className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700">
+              Details <ArrowRight size={12} />
+            </Link>
+          </div>
+          <ClockControl compact todayClockIn={ownAtt?.clock_in ?? null} todayClockOut={ownAtt?.clock_out ?? null} todayNote={ownAtt?.note ?? null} />
+        </div>
+
+        {isPeopleOps && (
+          <section className="rounded-2xl border border-slate-200 bg-white">
+            <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4 sm:px-6">
+              <h2 className="flex items-center gap-2 font-semibold text-slate-900">
+                <Clock3 size={16} className="text-blue-600" /> Team today
+              </h2>
+            </div>
+            <div className="grid grid-cols-3 divide-x divide-slate-100 border-b border-slate-100">
+              <div className="px-2 py-3 text-center">
+                <p className="font-display text-xl font-semibold text-slate-900">{inNow}</p>
+                <p className="text-[11px] text-slate-400">Signed in</p>
+              </div>
+              <div className="px-2 py-3 text-center">
+                <p className="font-display text-xl font-semibold text-slate-900">{signedOut}</p>
+                <p className="text-[11px] text-slate-400">Out</p>
+              </div>
+              <div className="px-2 py-3 text-center">
+                <p className="font-display text-xl font-semibold text-slate-900">{notIn}</p>
+                <p className="text-[11px] text-slate-400">Not in</p>
+              </div>
+            </div>
+            <ul className="divide-y divide-slate-100">
+              {teamStaff.slice(0, 7).map((s) => {
+                const rec = teamRecordByUser.get(s.id)
+                return (
+                  <li key={s.id} className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
+                    <span className="flex min-w-0 items-center gap-2.5">
+                      <span
+                        className={`h-2 w-2 flex-shrink-0 rounded-full ${rec?.clock_in && !rec.clock_out ? 'bg-emerald-500' : rec?.clock_out ? 'bg-slate-300' : 'bg-red-400'}`}
+                      />
+                      <span className="truncate text-sm font-medium text-slate-800">{s.display_name ?? 'Staff'}</span>
+                    </span>
+                    <span className="flex-shrink-0 text-xs text-slate-400">
+                      {rec?.clock_in
+                        ? `${new Date(rec.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}${rec.clock_out ? ' – out' : ''}`
+                        : 'Not in'}
+                    </span>
+                  </li>
+                )
+              })}
+            </ul>
+            <Link
+              href="/hrm/attendance"
+              className="flex items-center justify-center gap-1.5 px-4 py-3 text-xs font-semibold text-blue-600 hover:text-blue-700 sm:px-6"
+            >
+              Open full attendance <ArrowRight size={12} />
+            </Link>
+          </section>
+        )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

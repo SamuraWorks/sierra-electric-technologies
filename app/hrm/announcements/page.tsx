@@ -3,17 +3,12 @@ import { Megaphone } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { getAuthContext, hasPermission } from '@/lib/hrm/auth'
 import { QuickForm } from '@/components/hrm/quick-form'
+import { AnnouncementCard } from '@/components/hrm/announcement-card'
 
 export const metadata = { title: 'Announcements' }
 
-const PRIORITY_BADGE: Record<string, string> = {
-  normal: 'bg-slate-100 text-slate-600',
-  high: 'bg-blue-50 text-blue-700',
-  urgent: 'bg-red-50 text-red-700',
-}
-
-const fmt = (d: string | null) =>
-  d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''
+type ReactionRow = { emoji: string; count: number; includesMe: boolean }
+type CommentItem = { id: string; body: string; createdAt: string; userId: string; authorName: string }
 
 export default async function AnnouncementsPage() {
   const ctx = await getAuthContext()
@@ -21,7 +16,9 @@ export default async function AnnouncementsPage() {
   if (!hasPermission(ctx, 'announcements.view')) redirect('/hrm/dashboard')
 
   const supabase = await createClient()
+  const userId = ctx.userId
   const canCreate = hasPermission(ctx, 'announcements.create') || hasPermission(ctx, 'announcements.manage')
+  const canModerate = hasPermission(ctx, 'announcements.manage')
 
   const { data: rows } = await supabase
     .from('announcements')
@@ -43,6 +40,46 @@ export default async function AnnouncementsPage() {
     }
   })
 
+  const ids = announcements.map((a) => a.id)
+  let reactionRows: Array<{ announcement_id: string; user_id: string; emoji: string }> = []
+  let commentRows: Array<Record<string, unknown>> = []
+
+  if (ids.length > 0) {
+    const [reactions, comments] = await Promise.all([
+      supabase.from('announcement_reactions').select('announcement_id, user_id, emoji'),
+      supabase.from('announcement_comments').select('id, announcement_id, user_id, body, created_at, author:user_id(display_name)').order('created_at', { ascending: true }),
+    ])
+    reactionRows = (reactions.data ?? []) as Array<{ announcement_id: string; user_id: string; emoji: string }>
+    commentRows = (comments.data ?? []) as Array<Record<string, unknown>>
+  }
+
+  function reactionsFor(announcementId: string): ReactionRow[] {
+    const byEmoji = new Map<string, { emoji: string; count: number; includesMe: boolean }>()
+    for (const r of reactionRows) {
+      if (r.announcement_id !== announcementId) continue
+      const row = byEmoji.get(r.emoji) ?? { emoji: r.emoji, count: 0, includesMe: false }
+      row.count += 1
+      if (r.user_id === userId) row.includesMe = true
+      byEmoji.set(r.emoji, row)
+    }
+    return Array.from(byEmoji.values())
+  }
+
+  function commentsFor(announcementId: string): CommentItem[] {
+    return commentRows
+      .filter((c) => String(c.announcement_id) === announcementId)
+      .map((c) => {
+        const author = Array.isArray(c.author) ? c.author[0] : c.author
+        return {
+          id: String(c.id),
+          body: String(c.body ?? ''),
+          createdAt: c.created_at ? String(c.created_at) : new Date().toISOString(),
+          userId: String(c.user_id ?? ''),
+          authorName: author ? String((author as Record<string, unknown>).display_name ?? '') : 'Staff',
+        }
+      })
+  }
+
   return (
     <div className="px-4 py-6 sm:px-6 sm:py-8">
       <div className="mb-6">
@@ -50,7 +87,7 @@ export default async function AnnouncementsPage() {
           <Megaphone size={13} /> Sierra Electric — Company
         </p>
         <h1 className="font-display text-3xl font-semibold text-slate-900">Announcements</h1>
-        <p className="mt-2 text-sm text-slate-500">Internal announcements for staff.</p>
+        <p className="mt-2 text-sm text-slate-500">Internal announcements for staff. React and comment below each one.</p>
       </div>
 
       {canCreate && (
@@ -94,26 +131,21 @@ export default async function AnnouncementsPage() {
           </p>
         )}
         {announcements.map((a) => (
-          <div
+          <AnnouncementCard
             key={a.id}
-            className={`rounded-2xl border bg-white p-5 ${a.isPinned ? 'border-blue-200 ring-1 ring-blue-100' : 'border-slate-200'}`}
-          >
-            <div className="flex flex-wrap items-center gap-2">
-              {a.isPinned && (
-                <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[10.5px] font-bold uppercase tracking-wide text-white">
-                  Pinned
-                </span>
-              )}
-              <h2 className="font-semibold text-slate-900">{a.title}</h2>
-              <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${PRIORITY_BADGE[a.priority] ?? PRIORITY_BADGE.normal}`}>
-                {a.priority}
-              </span>
-            </div>
-            <p className="mt-3 whitespace-pre-line text-sm text-slate-600">{a.body}</p>
-            <p className="mt-4 text-xs text-slate-400">
-              {a.authorName} · {a.audience} · {fmt(a.publishedAt)}
-            </p>
-          </div>
+            id={a.id}
+            title={a.title}
+            body={a.body}
+            audience={a.audience}
+            priority={a.priority}
+            isPinned={a.isPinned}
+            publishedAt={a.publishedAt}
+            authorName={a.authorName}
+            reactions={reactionsFor(a.id)}
+            comments={commentsFor(a.id)}
+            canModerate={canModerate}
+            currentUserId={userId}
+          />
         ))}
       </div>
     </div>

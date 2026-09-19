@@ -1,5 +1,3 @@
-
-
 -- >>>>>>>>>> FILE: 001_base_roles_demo.sql <<<<<<<<<<
 
 -- ============================================================
@@ -423,6 +421,7 @@ BEGIN
 END $$;
 
 select 'Sierra Electric HRM base schema seeded. Demo password for all seeded users: Demo@1234' as status;
+
 -- >>>>>>>>>> FILE: 002_seed_staff.sql <<<<<<<<<<
 
 -- ============================================================
@@ -529,6 +528,7 @@ BEGIN
 END $$;
 
 select 'Sierra Electric HRM staff roster seeded (20 staff, 6 role accounts).' as status;
+
 -- >>>>>>>>>> FILE: 003_leave.sql <<<<<<<<<<
 
 -- ============================================================
@@ -638,6 +638,7 @@ BEGIN
 END $$;
 
 select 'Leave module ready — leave_types seeded, sample requests added.' as status;
+
 -- >>>>>>>>>> FILE: 004_attendance.sql <<<<<<<<<<
 
 -- ============================================================
@@ -715,6 +716,7 @@ BEGIN
 END $$;
 
 select 'Attendance module ready — past 5 workdays seeded.' as status;
+
 -- >>>>>>>>>> FILE: 005_candidates.sql <<<<<<<<<<
 
 -- ============================================================
@@ -778,6 +780,7 @@ INSERT INTO public.candidates (display_name, email, phone, position_applied, sou
 ON CONFLICT (email) DO NOTHING;
 
 select 'Candidates module ready — 8 seeded applications.' as status;
+
 -- >>>>>>>>>> FILE: 006_payroll.sql <<<<<<<<<<
 
 -- ============================================================
@@ -905,6 +908,7 @@ BEGIN
 END $$;
 
 select 'Payroll module ready — salary configs + current month run seeded.' as status;
+
 -- >>>>>>>>>> FILE: 007_admin_analytics.sql <<<<<<<<<<
 
 -- ============================================================
@@ -1010,6 +1014,7 @@ SELECT * FROM (VALUES
   ('SierraNet Fibre', 'Patricia Williams', 'p.williams@sierranet.sl', '+232 76 111 006', 'Backbone power redundancy', 'Power redundancy design for national fibre backbone POPs.', 11750000, 'SLL', 'lost', now() - interval '9 days')
 ) AS v(company_name, contact_name, contact_email, contact_phone, gig_title, description, expected_value, currency, status, created_at)
 WHERE NOT EXISTS (SELECT 1 FROM public.partner_inquiries);
+
 -- >>>>>>>>>> FILE: 008_staff_operations.sql <<<<<<<<<<
 
 -- ============================================================
@@ -1407,6 +1412,7 @@ FROM (VALUES
 WHERE NOT EXISTS (SELECT 1 FROM public.announcements);
 
 select 'Staff & Operations schema seeded (departments, projects, tasks, work reports, payments, announcements). Positions left for later assignment.' as status;
+
 -- >>>>>>>>>> FILE: 009_portal_types.sql <<<<<<<<<<
 
 -- ============================================================
@@ -1577,6 +1583,7 @@ BEGIN
 END $$;
 
 select 'Portal types migrated: System Administrator, CEO, Co-Founder, Administrator, Staff Member.' as status;
+
 -- >>>>>>>>>> FILE: 010_avatar_storage.sql <<<<<<<<<<
 
 -- ============================================================
@@ -1664,3 +1671,84 @@ CREATE POLICY "Service role object access for avatars"
   WITH CHECK (bucket_id = 'avatars');
 
 select 'Avatars bucket and storage policies ready (public read; users upload to their own folder).' as status;
+
+-- >>>>>>>>>> FILE: 011_announcements_engage.sql <<<<<<<<<<
+
+-- ============================================================
+-- 011 — ANNOUNCEMENTS ENGAGEMENT
+-- Reactions + comments on announcements, with moderation.
+-- Idempotent; safe to re-run.
+-- ============================================================
+
+-- ------------------------------------------------------------------
+-- ANNOUNCEMENT REACTIONS (emoji, one per user+emoji per announcement)
+-- ------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.announcement_reactions (
+  announcement_id UUID NOT NULL REFERENCES public.announcements(id) ON DELETE CASCADE,
+  user_id         UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  emoji           TEXT NOT NULL,
+  created_at      TIMESTAMPTZ DEFAULT now(),
+  PRIMARY KEY (announcement_id, user_id, emoji)
+);
+
+ALTER TABLE public.announcement_reactions ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN DROP POLICY IF EXISTS "Announcement reactions readable by staff" ON public.announcement_reactions; EXCEPTION WHEN OTHERS THEN NULL; END $$;
+DO $$ BEGIN DROP POLICY IF EXISTS "Anyone can react to announcements" ON public.announcement_reactions; EXCEPTION WHEN OTHERS THEN NULL; END $$;
+DO $$ BEGIN DROP POLICY IF EXISTS "Anyone can remove own reaction" ON public.announcement_reactions; EXCEPTION WHEN OTHERS THEN NULL; END $$;
+
+CREATE POLICY "Announcement reactions readable by staff" ON public.announcement_reactions FOR SELECT
+  USING (public.user_has_any_permission(ARRAY['announcements.view', 'announcements.create', 'announcements.manage']));
+
+CREATE POLICY "Anyone can react to announcements" ON public.announcement_reactions FOR INSERT
+  WITH CHECK (
+    auth.uid() = user_id
+    AND public.user_has_any_permission(ARRAY['announcements.view', 'announcements.create', 'announcements.manage'])
+  );
+
+CREATE POLICY "Anyone can remove own reaction" ON public.announcement_reactions FOR DELETE
+  USING (auth.uid() = user_id);
+
+CREATE INDEX IF NOT EXISTS idx_announcement_reactions_announcement ON public.announcement_reactions(announcement_id);
+
+-- ------------------------------------------------------------------
+-- ANNOUNCEMENT COMMENTS
+-- ------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.announcement_comments (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  announcement_id UUID NOT NULL REFERENCES public.announcements(id) ON DELETE CASCADE,
+  user_id         UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  body            TEXT NOT NULL CHECK (char_length(body) BETWEEN 1 AND 1000),
+  created_at      TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE public.announcement_comments ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN DROP POLICY IF EXISTS "Announcement comments readable by staff" ON public.announcement_comments; EXCEPTION WHEN OTHERS THEN NULL; END $$;
+DO $$ BEGIN DROP POLICY IF EXISTS "Anyone can comment on announcements" ON public.announcement_comments; EXCEPTION WHEN OTHERS THEN NULL; END $$;
+DO $$ BEGIN DROP POLICY IF EXISTS "Authors can edit own comments" ON public.announcement_comments; EXCEPTION WHEN OTHERS THEN NULL; END $$;
+DO $$ BEGIN DROP POLICY IF EXISTS "Anyone can delete own comments" ON public.announcement_comments; EXCEPTION WHEN OTHERS THEN NULL; END $$;
+DO $$ BEGIN DROP POLICY IF EXISTS "Managers can moderate comments" ON public.announcement_comments; EXCEPTION WHEN OTHERS THEN NULL; END $$;
+
+CREATE POLICY "Announcement comments readable by staff" ON public.announcement_comments FOR SELECT
+  USING (public.user_has_any_permission(ARRAY['announcements.view', 'announcements.create', 'announcements.manage']));
+
+CREATE POLICY "Anyone can comment on announcements" ON public.announcement_comments FOR INSERT
+  WITH CHECK (
+    auth.uid() = user_id
+    AND public.user_has_any_permission(ARRAY['announcements.view', 'announcements.create', 'announcements.manage'])
+  );
+
+CREATE POLICY "Authors can edit own comments" ON public.announcement_comments FOR UPDATE
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Anyone can delete own comments" ON public.announcement_comments FOR DELETE
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Managers can moderate comments" ON public.announcement_comments FOR DELETE
+  USING (public.user_has_any_permission(ARRAY['announcements.manage']));
+
+CREATE INDEX IF NOT EXISTS idx_announcement_comments_announcement ON public.announcement_comments(announcement_id, created_at);
+
+select 'Announcements engagement ready — reactions + comments.' as status;

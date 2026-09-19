@@ -8,6 +8,7 @@ export async function POST(request: NextRequest) {
   const { supabase, ctx } = result
   const body = await request.json()
   const action = String(body.action ?? '').trim()
+  const note = String(body.note ?? '').trim().slice(0, 200)
 
   if (!['clock-in', 'clock-out'].includes(action)) {
     return jsonError('Invalid action')
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
     const { data: created, error } = await supabase
       .from('attendance_records')
-      .insert({ user_id: ctx.userId, date: today, clock_in: now.toISOString() })
+      .insert({ user_id: ctx.userId, date: today, clock_in: now.toISOString(), note: note || null })
       .select('id')
       .single()
     if (error) return jsonError(error.message, 500)
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
   }
   const { error } = await supabase
     .from('attendance_records')
-    .update({ clock_out: now.toISOString() })
+    .update({ clock_out: now.toISOString(), note: note || undefined })
     .eq('id', record.id)
   if (error) return jsonError(error.message, 500)
   await logAuditAction(supabase, 'attendance.clock_out', 'attendance_record', record.id)

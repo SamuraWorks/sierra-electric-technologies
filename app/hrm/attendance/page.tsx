@@ -39,7 +39,7 @@ export default async function AttendancePage({
 
   // Own record + team roster
   const [ownRes, rosterRes, staffRes] = await Promise.all([
-    supabase.from('attendance_records').select('clock_in, clock_out').eq('user_id', ctx.userId).eq('date', selected).maybeSingle(),
+    supabase.from('attendance_records').select('clock_in, clock_out, note').eq('user_id', ctx.userId).eq('date', selected).maybeSingle(),
     isPeopleOps
       ? supabase.from('attendance_records').select('id, user_id, clock_in, clock_out, note').eq('date', selected)
       : Promise.resolve({ data: [] }),
@@ -105,7 +105,11 @@ export default async function AttendancePage({
 
       <div className="mb-6 grid gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <ClockControl todayClockIn={own?.clock_in ?? null} todayClockOut={own?.clock_out ?? null} />
+          <ClockControl
+            todayClockIn={own?.clock_in ?? null}
+            todayClockOut={own?.clock_out ?? null}
+            todayNote={own?.note ?? null}
+          />
         </div>
         {isPeopleOps && weekSummary && (
           <div className="rounded-[var(--r-md)] border border-[var(--line)] bg-[var(--surface)] p-6">
@@ -158,6 +162,7 @@ export default async function AttendancePage({
                   <th className="px-5 py-3.5">Clock out</th>
                   <th className="px-5 py-3.5">Hours</th>
                   <th className="px-5 py-3.5">Status</th>
+                  <th className="hidden px-5 py-3.5 md:table-cell">Note</th>
                 </tr>
               </thead>
               <tbody>
@@ -194,6 +199,9 @@ export default async function AttendancePage({
                             Absent
                           </span>
                         )}
+                      </td>
+                      <td className="hidden max-w-[220px] px-5 py-3.5 text-xs text-[var(--muted)] md:table-cell">
+                        {rec?.note ? <span className="break-words">{rec.note}</span> : '—'}
                       </td>
                     </tr>
                   )
