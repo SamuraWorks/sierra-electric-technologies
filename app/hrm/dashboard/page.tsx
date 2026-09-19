@@ -311,7 +311,7 @@ export default async function DashboardPage() {
             </h2>
           </div>
           {can('audit.view') ? (
-            <<ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-slate-100">
               {audit.length === 0 && <li className="px-4 py-10 text-center text-sm text-slate-400 sm:px-6">No recent activity.</li>}
               {audit.map((a, i) => (
                 <li key={i} className="px-4 py-3.5 sm:px-6">
