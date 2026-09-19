@@ -311,12 +311,12 @@ export default async function DashboardPage() {
             </h2>
           </div>
           {can('audit.view') ? (
-            <ul className="divide-y divide-slate-100">
+            <<ul className="divide-y divide-slate-100">
               {audit.length === 0 && <li className="px-4 py-10 text-center text-sm text-slate-400 sm:px-6">No recent activity.</li>}
               {audit.map((a, i) => (
                 <li key={i} className="px-4 py-3.5 sm:px-6">
-                  <p className="text-sm text-slate-700">{a.action}</p>
-                  <p className="mt-0.5 text-xs text-slate-400">
+                  <p className="break-words text-sm text-slate-700">{a.action}</p>
+                  <p className="mt-0.5 break-words text-xs text-slate-400">
                     {a.targetType} · {timeAgo(a.createdAt)}
                   </p>
                 </li>
@@ -328,17 +328,17 @@ export default async function DashboardPage() {
               {notifications.map((n) => (
                 <li key={n.id} className="px-4 py-3.5 sm:px-6">
                   {n.link ? (
-                    <Link href={n.link} className="block text-sm font-medium text-slate-800">
+                    <Link href={n.link} className="block break-words text-sm font-medium text-slate-800">
                       {n.title}
                       {!n.is_read && <span className="ml-2 inline-block h-2 w-2 rounded-full bg-blue-600" />}
                     </Link>
                   ) : (
-                    <p className="text-sm font-medium text-slate-800">
+                    <p className="break-words text-sm font-medium text-slate-800">
                       {n.title}
                       {!n.is_read && <span className="ml-2 inline-block h-2 w-2 rounded-full bg-blue-600" />}
                     </p>
                   )}
-                  {n.message && <p className="mt-0.5 truncate text-xs text-slate-400">{n.message}</p>}
+                  {n.message && <p className="mt-0.5 break-words text-xs text-slate-400">{n.message}</p>}
                   <p className="mt-1 text-[11px] text-slate-300">{timeAgo(n.created_at)}</p>
                 </li>
               ))}
@@ -357,14 +357,19 @@ export default async function DashboardPage() {
           </div>
           <ul className="divide-y divide-slate-100">
             {announcements.length === 0 && (
-              <li className="px-6 py-10 text-center text-sm text-slate-400">No announcements yet.</li>
+              <li className="px-4 py-10 text-center text-sm text-slate-400 sm:px-6">No announcements yet.</li>
             )}
             {announcements.map((a) => (
-              <li key={a.id} className="flex items-center justify-between gap-3 px-4 py-3.5 sm:px-6">
-                <Link href="/hrm/announcements" className="min-w-0 truncate text-sm font-medium text-slate-800 hover:text-blue-700">
-                  {a.title}
-                </Link>
-                <span className="flex-shrink-0 text-xs text-slate-400">{timeAgo(a.published_at)}</span>
+              <li key={a.id} className="px-4 py-3.5 sm:px-6">
+                <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                  <Link
+                    href="/hrm/announcements"
+                    className="min-w-0 break-words text-sm font-medium text-slate-800 hover:text-blue-700"
+                  >
+                    {a.title}
+                  </Link>
+                  <span className="flex-shrink-0 text-xs text-slate-400 sm:ml-4">{timeAgo(a.published_at)}</span>
+                </div>
               </li>
             ))}
           </ul>
