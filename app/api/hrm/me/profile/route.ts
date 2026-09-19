@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import { jsonOk, jsonError, requireAuth, logAuditAction } from '@/lib/api'
+import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 const UPDATE_FIELDS = ['display_name', 'phone', 'email', 'photo_url'] as const
@@ -21,31 +22,42 @@ export async function PATCH(request: NextRequest) {
   }
 
   if (!('display_name' in clean)) clean.display_name = String(ctx.profile?.display_name ?? '')
-
-  if (Object.keys(clean).length === 0) return jsonError('No fields to update', 400)
   if (!clean.display_name || !String(clean.display_name).trim()) {
     return jsonError('Your name cannot be empty', 400)
   }
 
-  const admin = createAdminClient()
   const currentEmail = String(ctx.profile?.email ?? '')
   const newEmail = clean.email ? String(clean.email) : null
 
+  // --- Email changed? Sync auth.users via the admin client (best-effort).
+  // The profiles row still updates regardless — RLS guards own-row edits.
+  let emailWarning: string | null = null
+
   if (newEmail && newEmail !== currentEmail) {
     if (!EMAIL_RE.test(newEmail)) return jsonError('Please enter a valid email address', 400)
-    const { error: authError } = await admin.auth.admin.updateUserById(ctx.userId, {
-      email: newEmail,
-      email_confirm: true,
-    })
-    if (authError) return jsonError(authError.message, 400)
+    try {
+      const admin = createAdminClient()
+      const { error: authError } = await admin.auth.admin.updateUserById(ctx.userId, {
+        email: newEmail,
+        email_confirm: true,
+      })
+      if (authError) {
+        emailWarning = `Email could not be applied (${authError.message}). Your other details were saved — contact IT if this matters.`
+      }
+    } catch {
+      emailWarning =
+        'Email could not be applied (service-role key not configured on this server). Your other details were saved — contact IT to change the email.'
+    }
   } else {
     delete clean.email
   }
 
-  const { error } = await admin.from('profiles').update(clean).eq('id', ctx.userId)
+  // Profile row is written through the session client so it works on Vercel
+  // without the service-role key (RLS "Users can update own profile").
+  const { error } = await supabase.from('profiles').update(clean).eq('id', ctx.userId)
   if (error) return jsonError(error.message, 400)
 
   await logAuditAction(supabase, 'profile.update', 'profiles', ctx.userId, null, clean)
 
-  return jsonOk({ success: true, profile: clean })
+  return jsonOk({ success: true, profile: clean, emailWarning })
 }
