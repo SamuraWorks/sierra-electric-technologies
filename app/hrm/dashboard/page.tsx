@@ -205,7 +205,7 @@ export default async function DashboardPage() {
   return (
     <div className="px-4 py-6 sm:px-6 sm:py-8">
       <div className="mb-7">
-        <h1 className="font-display text-2xl font-semibold text-slate-900 sm:text-3xl">
+        <h1 className="font-display text-3xl font-semibold text-slate-900">
           {greeting(now)}, {firstName}
         </h1>
         <p className="mt-1.5 text-sm text-slate-500">
@@ -213,27 +213,26 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {cards.map(({ label, value, href, icon: Icon, color }) => (
           <Link
             key={label}
             href={href}
-            className="rounded-2xl border border-slate-200 bg-white p-4 transition-colors hover:border-slate-300 sm:p-5"
+            className="rounded-2xl border border-slate-200 bg-white p-5 transition-colors hover:border-slate-300"
           >
-            <div className="flex items-center justify-between gap-2">
-              <p className="truncate text-xs text-slate-500 sm:text-sm">{label}</p>
-              <span className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-white sm:h-9 sm:w-9 ${color}`}>
-                <Icon size={15} className="sm:hidden" />
-                <Icon size={16} className="hidden sm:block" />
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm text-slate-500">{label}</p>
+              <span className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-white ${color}`}>
+                <Icon size={16} />
               </span>
             </div>
-            <p className="mt-2 truncate font-display text-xl font-semibold text-slate-900 sm:text-2xl xl:text-3xl">{value}</p>
+            <p className="mt-2 font-display text-3xl font-semibold text-slate-900">{value}</p>
           </Link>
         ))}
       </div>
 
       {quickActions.length > 0 && (
-        <div className="mt-6 flex flex-wrap gap-2.5">
+        <div className="mt-6 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap">
           {quickActions.map(({ label, href, icon: Icon }) => (
             <Link
               key={label}
@@ -248,7 +247,7 @@ export default async function DashboardPage() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <section className="rounded-2xl border border-slate-200 bg-white lg:col-span-2">
-          <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4 sm:px-6">
             <h2 className="flex items-center gap-2 font-semibold text-slate-900">
               <ListTodo size={16} className="text-blue-600" /> My work
             </h2>
@@ -261,7 +260,7 @@ export default async function DashboardPage() {
               <li className="px-6 py-12 text-center text-sm text-slate-400">No open tasks assigned to you.</li>
             )}
             {myTasks.map((t) => (
-              <li key={t.id} className="flex items-center justify-between gap-3 px-6 py-3.5">
+              <li key={t.id} className="flex flex-col gap-2 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:px-6">
                 <div className="flex min-w-0 items-center gap-2.5">
                   <span className={`h-2 w-2 flex-shrink-0 rounded-full ${PRIORITY_DOT[t.priority] ?? PRIORITY_DOT.medium}`} />
                   <div className="min-w-0">
@@ -272,7 +271,7 @@ export default async function DashboardPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-shrink-0 items-center gap-2">
+                <div className="flex flex-shrink-0 items-center gap-2 sm:pl-5">
                   {t.dueDate && t.dueDate < today && (
                     <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10.5px] font-semibold text-red-600">Overdue</span>
                   )}
@@ -286,14 +285,14 @@ export default async function DashboardPage() {
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white">
-          <div className="border-b border-slate-100 px-6 py-4">
+          <div className="border-b border-slate-100 px-4 py-4 sm:px-6">
             <h2 className="flex items-center gap-2 font-semibold text-slate-900">
               <TrendingUp size={16} className="text-blue-600" /> Company snapshot
             </h2>
           </div>
           <div className="divide-y divide-slate-100">
             {snapshot.map(({ label, value, icon: Icon }) => (
-              <div key={label} className="flex items-center justify-between px-6 py-3.5">
+              <div key={label} className="flex items-center justify-between px-4 py-3.5 sm:px-6">
                 <span className="flex items-center gap-2.5 text-sm text-slate-500">
                   <Icon size={15} className="text-slate-400" /> {label}
                 </span>
@@ -306,16 +305,16 @@ export default async function DashboardPage() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <section className="rounded-2xl border border-slate-200 bg-white">
-          <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4 sm:px-6">
             <h2 className="flex items-center gap-2 font-semibold text-slate-900">
               <ScrollText size={16} className="text-blue-600" /> Recent activity
             </h2>
           </div>
           {can('audit.view') ? (
             <ul className="divide-y divide-slate-100">
-              {audit.length === 0 && <li className="px-6 py-10 text-center text-sm text-slate-400">No recent activity.</li>}
+              {audit.length === 0 && <li className="px-4 py-10 text-center text-sm text-slate-400 sm:px-6">No recent activity.</li>}
               {audit.map((a, i) => (
-                <li key={i} className="px-6 py-3.5">
+                <li key={i} className="px-4 py-3.5 sm:px-6">
                   <p className="text-sm text-slate-700">{a.action}</p>
                   <p className="mt-0.5 text-xs text-slate-400">
                     {a.targetType} · {timeAgo(a.createdAt)}
@@ -325,9 +324,9 @@ export default async function DashboardPage() {
             </ul>
           ) : (
             <ul className="divide-y divide-slate-100">
-              {notifications.length === 0 && <li className="px-6 py-10 text-center text-sm text-slate-400">You&apos;re all caught up.</li>}
+              {notifications.length === 0 && <li className="px-4 py-10 text-center text-sm text-slate-400 sm:px-6">You&apos;re all caught up.</li>}
               {notifications.map((n) => (
-                <li key={n.id} className="px-6 py-3.5">
+                <li key={n.id} className="px-4 py-3.5 sm:px-6">
                   {n.link ? (
                     <Link href={n.link} className="block text-sm font-medium text-slate-800">
                       {n.title}
@@ -348,7 +347,7 @@ export default async function DashboardPage() {
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white">
-          <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4 sm:px-6">
             <h2 className="flex items-center gap-2 font-semibold text-slate-900">
               <Megaphone size={16} className="text-blue-600" /> Announcements
             </h2>
@@ -361,7 +360,7 @@ export default async function DashboardPage() {
               <li className="px-6 py-10 text-center text-sm text-slate-400">No announcements yet.</li>
             )}
             {announcements.map((a) => (
-              <li key={a.id} className="flex items-center justify-between gap-3 px-6 py-3.5">
+              <li key={a.id} className="flex items-center justify-between gap-3 px-4 py-3.5 sm:px-6">
                 <Link href="/hrm/announcements" className="min-w-0 truncate text-sm font-medium text-slate-800 hover:text-blue-700">
                   {a.title}
                 </Link>
