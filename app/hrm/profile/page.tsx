@@ -1,8 +1,9 @@
 import { redirect } from 'next/navigation'
-import { UserRound, Mail, Phone, Building2, BadgeCheck, Activity } from 'lucide-react'
+import { UserRound, BadgeCheck, Activity } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { getAuthContext } from '@/lib/hrm/auth'
 import { ChangePassword } from '@/components/hrm/change-password'
+import { ProfileForm } from '@/components/hrm/profile-form'
 
 export const metadata = { title: 'My Profile' }
 
@@ -47,15 +48,6 @@ export default async function ProfilePage() {
     createdAt: a.created_at ? String(a.created_at) : null,
   }))
 
-  const info = [
-    { icon: Mail, label: 'Email', value: profile.email ? String(profile.email) : '—' },
-    { icon: Phone, label: 'Phone', value: profile.phone ? String(profile.phone) : '—' },
-    { icon: BadgeCheck, label: 'Employee ID', value: profile.employee_id ? String(profile.employee_id) : '—' },
-    { icon: Building2, label: 'Department', value: profile.department ? String(profile.department) : '—' },
-    { icon: UserRound, label: 'Employment status', value: profile.status ? String(profile.status).replace('_', ' ') : '—' },
-    { icon: Activity, label: 'Joined', value: fmtDateTime(profile.created_at ? String(profile.created_at) : null) },
-  ]
-
   return (
     <div className="px-4 py-6 sm:px-6 sm:py-8">
       <div className="mb-6">
@@ -68,9 +60,17 @@ export default async function ProfilePage() {
 
       <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-6">
         <div className="flex flex-wrap items-center gap-5">
-          <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 font-display text-xl font-semibold text-white">
-            {initials}
-          </span>
+          {profile.photo_url ? (
+            <img
+              src={String(profile.photo_url)}
+              alt=""
+              className="h-16 w-16 rounded-2xl object-cover ring-1 ring-slate-200"
+            />
+          ) : (
+            <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 font-display text-xl font-semibold text-white">
+              {initials}
+            </span>
+          )}
           <div>
             <h2 className="font-display text-2xl font-semibold text-slate-900">{name}</h2>
             <p className="mt-0.5 text-sm text-slate-500">
@@ -91,20 +91,14 @@ export default async function ProfilePage() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
-            <h2 className="mb-4 text-sm font-semibold text-slate-900">Personal information</h2>
-            <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
-              {info.map((row) => (
-                <div key={row.label} className="flex items-start gap-3">
-                  <row.icon size={16} className="mt-0.5 flex-shrink-0 text-slate-400" />
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">{row.label}</p>
-                    <p className="mt-0.5 text-sm capitalize text-slate-700">{row.value}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ProfileForm
+            initial={{
+              displayName: name,
+              phone: profile.phone ? String(profile.phone) : '',
+              email: profile.email ? String(profile.email) : '',
+              photoUrl: profile.photo_url ? String(profile.photo_url) : null,
+            }}
+          />
 
           <ChangePassword />
         </div>

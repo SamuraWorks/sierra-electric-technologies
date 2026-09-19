@@ -175,9 +175,17 @@ function UserMenu({ user }: { user: PortalUser }) {
         aria-haspopup="menu"
         aria-expanded={open}
       >
-        <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">
-          {initialsOf(user.displayName)}
-        </span>
+        {user.photoUrl ? (
+          <img
+            src={user.photoUrl}
+            alt=""
+            className="h-7 w-7 flex-shrink-0 rounded-full bg-blue-600 object-cover ring-1 ring-slate-200"
+          />
+        ) : (
+          <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">
+            {initialsOf(user.displayName)}
+          </span>
+        )}
         <span className="hidden text-left sm:block">
           <span className="block text-sm font-medium leading-none text-slate-900">{user.displayName}</span>
           <span className="mt-0.5 block text-xs leading-none text-slate-400">
