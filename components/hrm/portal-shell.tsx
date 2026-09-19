@@ -275,7 +275,7 @@ export function PortalShell({ children, user }: PortalShellProps) {
   }
 
   return (
-    <div className="hrm-portal flex h-screen overflow-hidden bg-slate-50">
+    <div className="hrm-portal flex h-dvh overflow-hidden bg-slate-50">
       {/* Desktop sidebar — slides in/out via the hamburger on the slider */}
       <div className="hidden h-full lg:block">
         <Sidebar user={user} pathname={pathname} collapsed={!sidebarOpen} onToggle={toggleSidebar} />

@@ -205,7 +205,7 @@ export default async function DashboardPage() {
   return (
     <div className="px-4 py-6 sm:px-6 sm:py-8">
       <div className="mb-7">
-        <h1 className="font-display text-3xl font-semibold text-slate-900">
+        <h1 className="font-display text-2xl font-semibold text-slate-900 sm:text-3xl">
           {greeting(now)}, {firstName}
         </h1>
         <p className="mt-1.5 text-sm text-slate-500">
@@ -213,20 +213,21 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
         {cards.map(({ label, value, href, icon: Icon, color }) => (
           <Link
             key={label}
             href={href}
-            className="rounded-2xl border border-slate-200 bg-white p-5 transition-colors hover:border-slate-300"
+            className="rounded-2xl border border-slate-200 bg-white p-4 transition-colors hover:border-slate-300 sm:p-5"
           >
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-sm text-slate-500">{label}</p>
-              <span className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-white ${color}`}>
-                <Icon size={16} />
+            <div className="flex items-center justify-between gap-2">
+              <p className="truncate text-xs text-slate-500 sm:text-sm">{label}</p>
+              <span className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-white sm:h-9 sm:w-9 ${color}`}>
+                <Icon size={15} className="sm:hidden" />
+                <Icon size={16} className="hidden sm:block" />
               </span>
             </div>
-            <p className="mt-2 font-display text-3xl font-semibold text-slate-900">{value}</p>
+            <p className="mt-2 truncate font-display text-xl font-semibold text-slate-900 sm:text-2xl xl:text-3xl">{value}</p>
           </Link>
         ))}
       </div>
